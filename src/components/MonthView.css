@@ -1,0 +1,324 @@
+.month-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f6fb;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* SCHEDULE CONTROLS (Navigation + View Mode) */
+
+.schedule-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.schedule-nav-left {
+  display: flex;
+  gap: 8px;
+}
+
+.schedule-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-nav-button:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.04);
+  color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+
+.schedule-date-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #fafbff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  min-width: 220px;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.schedule-date-display:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.04);
+  color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+
+.schedule-view-mode-selector {
+  display: flex;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+}
+
+.schedule-view-mode-button {
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.schedule-view-mode-button:hover {
+  color: #0f172a;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.schedule-view-mode-button.active {
+  background: #ffffff;
+  color: #6366f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.month-container {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  margin: 16px 24px 24px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.month-header {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  padding: 20px 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.month-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+}
+
+.month-calendar {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.weekday-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: #e2e8f0;
+  margin-bottom: 1px;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.weekday-header {
+  background: #f8fafc;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 12px;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: #e2e8f0;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.calendar-day {
+  background: #fff;
+  min-height: 110px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-day.other-month {
+  background: #f8f9fa;
+  opacity: 0.5;
+}
+
+.calendar-day.today {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 2px solid #2ecc71;
+}
+
+.calendar-day.selected {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #3498db;
+}
+
+.day-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.calendar-day.today .day-number {
+  background: #2ecc71;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-bookings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.month-booking {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.month-booking.green {
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(39, 174, 96, 0.2) 100%);
+  border-left: 3px solid #2ecc71;
+  color: #27ae60;
+}
+
+.month-booking.blue {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(41, 128, 185, 0.2) 100%);
+  border-left: 3px solid #3498db;
+  color: #2980b9;
+}
+
+.month-booking:hover {
+  transform: translateX(4px);
+}
+
+.booking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.month-booking.green .booking-dot {
+  background: #2ecc71;
+}
+
+.month-booking.blue .booking-dot {
+  background: #3498db;
+}
+
+.booking-text {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more-bookings {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 600;
+  padding: 4px 8px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* Scrollbar styling */
+
+.month-container::-webkit-scrollbar,
+.month-calendar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.month-container::-webkit-scrollbar-thumb,
+.month-calendar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.month-container::-webkit-scrollbar-thumb:hover,
+.month-calendar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+  background-clip: padding-box;
+}
+
+.month-container::-webkit-scrollbar-track,
+.month-calendar::-webkit-scrollbar-track {
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 10px;
+}

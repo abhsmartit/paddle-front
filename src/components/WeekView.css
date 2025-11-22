@@ -1,0 +1,318 @@
+.week-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f4f6fb;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* SCHEDULE CONTROLS (Navigation + View Mode) */
+
+.schedule-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.schedule-nav-left {
+  display: flex;
+  gap: 8px;
+}
+
+.schedule-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-nav-button:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.04);
+  color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+
+.schedule-date-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #fafbff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  min-width: 220px;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.schedule-date-display:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.04);
+  color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+
+.schedule-view-mode-selector {
+  display: flex;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #edf2f7;
+}
+
+.schedule-view-mode-button {
+  padding: 8px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.schedule-view-mode-button:hover {
+  color: #0f172a;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.schedule-view-mode-button.active {
+  background: #ffffff;
+  color: #6366f1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.week-container {
+  flex: 1;
+  overflow: auto;
+  background: #fff;
+  margin: 16px 24px 24px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: 150px repeat(7, minmax(140px, 1fr));
+  gap: 1px;
+  background: #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.time-column-header {
+  background: #f8fafc;
+  padding: 16px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #e2e8f0;
+}
+
+.day-header {
+  background: #ffffff;
+  padding: 14px 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  border-right: 1px solid #e2e8f0;
+}
+
+.day-header:last-child {
+  border-right: none;
+}
+
+.day-header.active {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-bottom: 3px solid #6366f1;
+}
+
+.day-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.day-date {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.week-courts {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.week-court-row {
+  display: grid;
+  grid-template-columns: 150px repeat(7, minmax(140px, 1fr));
+  gap: 1px;
+  background: #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.court-label {
+  background: #f8fafc;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  border-right: 1px solid #e2e8f0;
+}
+
+.court-label .court-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.court-label .court-capacity {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.week-day-cell {
+  background: #fff;
+  padding: 10px 8px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  border-right: 1px solid #e2e8f0;
+}
+
+.week-day-cell:last-child {
+  border-right: none;
+}
+
+.empty-cell {
+  height: 100%;
+  min-height: 60px;
+}
+
+.week-booking {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.week-booking.green {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+}
+
+.week-booking.blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.week-booking.purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.week-booking.orange {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+}
+
+.week-booking:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.week-booking-time {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  opacity: 0.95;
+}
+
+.week-booking-name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Scrollbar styling */
+
+.week-container::-webkit-scrollbar,
+.week-courts::-webkit-scrollbar,
+.week-day-cell::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.week-container::-webkit-scrollbar-thumb,
+.week-courts::-webkit-scrollbar-thumb,
+.week-day-cell::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.week-container::-webkit-scrollbar-thumb:hover,
+.week-courts::-webkit-scrollbar-thumb:hover,
+.week-day-cell::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+  background-clip: padding-box;
+}
+
+.week-container::-webkit-scrollbar-track,
+.week-courts::-webkit-scrollbar-track,
+.week-day-cell::-webkit-scrollbar-track {
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 10px;
+}
