@@ -150,34 +150,24 @@
 .time-slot {
   background: #fff;
   padding: 8px;
-  font-size: 12px;
+  font-size: 11px;
   color: #95a5a6;
   font-weight: 600;
   display: flex;
   justify-content: center;
-  padding-top: 12px;
-  height: 80px;
-}
-
-.court-cell-container {
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  height: 80px;
-  position: relative;
+  align-items: flex-start;
+  padding-top: 8px;
+  height: 40px; /* Half-hour slot height */
 }
 
 /* Each half-hour cell */
 .court-cell-half {
-  flex: 1;
+  background: #fff;
+  height: 40px; /* Half-hour slot height */
   position: relative;
   border-bottom: 1px dashed #f1f2f6;
   pointer-events: auto;      /* allow dropping anywhere */
   overflow: visible;         /* let card shadow/rounding show */
-}
-
-.court-cell-half.second-half {
-  border-bottom: none;
 }
 
 .court-cell-half.has-booking {
@@ -186,11 +176,11 @@
 
 /* --- Booking Card (Ahmed Samir style) --- */
 .booking-card {
-  width: calc(100% - 10px);      /* little space from cell edges */
-  height: 100%;
-  margin: 5px;
+  width: calc(100% - 6px);
+  position: absolute;
+  top: 3px;
+  left: 3px;
   border-radius: 4px;
-  overflow: hidden;
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
@@ -199,9 +189,10 @@
   background: #2f8b3a;
   color: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-  position: relative;
-  z-index: 2; /* below header (20), above grid (1) */
+  z-index: 5; /* above other cells */
   cursor: grab;
+  min-height: 34px; /* Ensure minimum height */
+  pointer-events: auto;
 }
 
 .booking-card:active {
@@ -219,49 +210,130 @@
   background: #2980b9;
 }
 
-/* left strip */
+/* left strip - more compact for small cards */
 .booking-card-left {
-  width: 46px;
+  width: 38px;
   background: rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 4px;
-  font-size: 11px;
+  justify-content: center;
+  padding: 4px 2px;
+  font-size: 10px;
   font-weight: 600;
   text-align: center;
+  gap: 2px;
 }
 
 .booking-card-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.booking-card-icon svg {
+  width: 14px;
+  height: 14px;
 }
 
 .booking-card-price {
-  line-height: 1.2;
+  line-height: 1.1;
+  font-size: 9px;
+  white-space: nowrap;
 }
 
-/* right content */
+/* right content - responsive padding */
 .booking-card-main {
   flex: 1;
-  padding: 8px 12px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 4px;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .booking-card-name {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .booking-card-time {
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  font-size: 10px;
+  letter-spacing: 0.01em;
   opacity: 0.9;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* View Details Button */
+.booking-card-view-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #2c3e50;
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.booking-card:hover .booking-card-view-btn {
+  opacity: 1;
+}
+
+.booking-card-view-btn:hover {
+  background: #2ecc71;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Larger cards (1+ hour) get more space */
+@media (min-height: 80px) {
+  .booking-card-left {
+    width: 46px;
+    padding: 6px 4px;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+  
+  .booking-card-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .booking-card-price {
+    font-size: 10px;
+  }
+  
+  .booking-card-main {
+    padding: 6px 10px;
+    gap: 3px;
+  }
+  
+  .booking-card-name {
+    font-size: 12px;
+  }
+  
+  .booking-card-time {
+    font-size: 11px;
+  }
 }
 
 /* ---------- CALENDAR DROPDOWN STYLES ---------- */

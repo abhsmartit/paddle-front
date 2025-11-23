@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import {
   format,
   addMonths,
@@ -14,6 +14,7 @@ import {
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Booking, Court, ViewMode } from '../types';
 import BookingCard from './BookingCard';
+import BookingDetailsModal from './BookingDetailsModal';
 import './ScheduleView.css';
 
 interface ScheduleViewProps {
@@ -23,6 +24,7 @@ interface ScheduleViewProps {
   viewMode: ViewMode;
   onDateChange: (date: Date) => void;
   onViewModeChange: (mode: ViewMode) => void;
+  onBookingDragDrop?: (bookingId: string, newCourtId: string, newStartTime: string, newEndTime: string, date: string) => Promise<void>;
 }
 
 const ScheduleView = ({
@@ -32,10 +34,12 @@ const ScheduleView = ({
   viewMode,
   onDateChange,
   onViewModeChange,
+  onBookingDragDrop,
 }: ScheduleViewProps) => {
-  const [allBookings, setAllBookings] = useState<Booking[]>(bookings);
-  const [draggedBooking, setDraggedBooking] = useState<Booking | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [draggedBooking, setDraggedBooking] = useState<Booking | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // --- Handlers ---
   const handlePrevious = () => {
@@ -48,6 +52,53 @@ const ScheduleView = ({
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + 1);
     onDateChange(newDate);
+  };
+
+  const handleDragStart = (booking: Booking) => {
+    setDraggedBooking(booking);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleViewDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedBooking(null);
+  };
+
+  const getTimeFromSlot = (slotIndex: number): string => {
+    const hour = Math.floor(slotIndex / 2) % 24;
+    const minutes = slotIndex % 2 === 0 ? '00' : '30';
+    return `${hour.toString().padStart(2, '0')}:${minutes}`;
+  };
+
+  const handleDrop = async (courtId: string, slotIndex: number) => {
+    if (!draggedBooking || !onBookingDragDrop) {
+      setDraggedBooking(null);
+      return;
+    }
+
+    const duration = getDuration(draggedBooking.startTime, draggedBooking.endTime);
+    const newStartTime = getTimeFromSlot(slotIndex);
+    const newEndTime = getTimeFromSlot(slotIndex + duration);
+    const currentDateStr = format(selectedDate, 'yyyy-MM-dd');
+
+    // Call the API handler
+    await onBookingDragDrop(
+      draggedBooking.id,
+      courtId,
+      newStartTime,
+      newEndTime,
+      currentDateStr
+    );
+
+    setDraggedBooking(null);
   };
 
   const toggleCalendar = () => {
@@ -72,26 +123,27 @@ const ScheduleView = ({
 
   // --- Grid Logic ---
   const currentDateStr = format(selectedDate, 'yyyy-MM-dd');
-  const dayBookings = allBookings.filter(
-    (booking) => booking.date === currentDateStr
-  );
+  
+  // Filter bookings to show:
+  // 1. Bookings that start on current date
+  // 2. Overnight bookings from previous day that end on current date
+  const dayBookings = bookings.filter((booking) => {
+    const startsToday = booking.date === currentDateStr;
+    const endsToday = booking.isOvernightBooking && booking.endDate === currentDateStr;
+    return startsToday || endsToday;
+  });
 
-  const timeSlots = Array.from({ length: 24 }, (_, i) => {
-    const hour = i;
+  const timeSlots = Array.from({ length: 48 }, (_, i) => {
+    const hour = Math.floor(i / 2);
+    const minutes = i % 2 === 0 ? '00' : '30';
     const period = hour < 12 ? 'AM' : 'PM';
     const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-    return `${displayHour}:00 ${period}`;
+    return `${displayHour}:${minutes} ${period}`;
   });
 
   const getSlotIndex = (time: string): number => {
     const [hours, minutes] = time.split(':').map(Number);
-    return hours * 2 + (minutes === 30 ? 1 : 0);
-  };
-
-  const getTimeFromSlot = (slotIndex: number): string => {
-    const hour = Math.floor(slotIndex / 2) % 24;
-    const minutes = slotIndex % 2 === 0 ? '00' : '30';
-    return `${hour.toString().padStart(2, '0')}:${minutes}`;
+    return hours * 2 + (minutes >= 30 ? 1 : 0);
   };
 
   const getDuration = (startTime: string, endTime: string): number => {
@@ -101,36 +153,21 @@ const ScheduleView = ({
     return end - start;
   };
 
-  const handleDragStart = (booking: Booking) => {
-    setDraggedBooking(booking);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (courtId: string, slotIndex: number) => {
-    if (!draggedBooking) return;
-    const duration = getDuration(
-      draggedBooking.startTime,
-      draggedBooking.endTime
-    );
-    const newStartTime = getTimeFromSlot(slotIndex);
-    const newEndTime = getTimeFromSlot(slotIndex + duration);
-
-    const updatedBookings = allBookings.map((booking) =>
-      booking.id === draggedBooking.id
-        ? {
-            ...booking,
-            courtId,
-            startTime: newStartTime,
-            endTime: newEndTime,
-            date: currentDateStr,
-          }
-        : booking
-    );
-    setAllBookings(updatedBookings);
-    setDraggedBooking(null);
+  const getDisplayDuration = (booking: Booking): number => {
+    // For overnight bookings ending today, calculate from midnight
+    if (booking.isOvernightBooking && booking.endDate === currentDateStr) {
+      const e = getSlotIndex(booking.endTime);
+      return e; // From 00:00 to end time
+    }
+    
+    // For bookings starting today
+    const s = getSlotIndex(booking.startTime);
+    const e = getSlotIndex(booking.endTime);
+    
+    // If booking ends after midnight (overnight), show until end of day
+    if (e <= s) return 48 - s;
+    
+    return e - s;
   };
 
   return (
@@ -247,7 +284,7 @@ const ScheduleView = ({
         <div className="schedule-header">
           <div className="time-column-header"></div>
           {courts.map((court) => (
-            <div key={court.id} className="court-header">
+            <div key={court.id || court._id} className="court-header">
               <div className="court-name">{court.name}</div>
               <div className="court-capacity">({court.capacity})</div>
             </div>
@@ -255,89 +292,60 @@ const ScheduleView = ({
         </div>
 
         <div className="schedule-grid">
-          {timeSlots.map((time, hourIndex) => (
+          {timeSlots.map((time, slotIndex) => (
             <Fragment key={time}>
               <div className="time-slot">{time}</div>
               {courts.map((court) => {
-                const firstHalfSlot = hourIndex * 2;
-                const secondHalfSlot = hourIndex * 2 + 1;
+                const courtId = court.id || court._id || '';
 
-                const firstHalfBooking = dayBookings.find((booking) => {
+                const slotBooking = dayBookings.find((booking) => {
+                  // For overnight bookings ending today, they start at slot 0
+                  if (booking.isOvernightBooking && booking.endDate === currentDateStr) {
+                    const e = getSlotIndex(booking.endTime);
+                    return (
+                      booking.courtId === courtId &&
+                      slotIndex >= 0 &&
+                      slotIndex < e
+                    );
+                  }
+                  
+                  // For regular bookings or bookings starting today
                   const s = getSlotIndex(booking.startTime);
                   let e = getSlotIndex(booking.endTime);
-                  if (e <= s) e += 48;
+                  
+                  if (e <= s) e += 48; // Overnight booking
+                  
                   return (
-                    booking.courtId === court.id &&
-                    firstHalfSlot >= s &&
-                    firstHalfSlot < Math.min(e, 48)
+                    booking.courtId === courtId &&
+                    slotIndex >= s &&
+                    slotIndex <= e
                   );
                 });
+                console.log(slotBooking ,"slotBooking");
+                
 
-                const secondHalfBooking = dayBookings.find((booking) => {
-                  const s = getSlotIndex(booking.startTime);
-                  let e = getSlotIndex(booking.endTime);
-                  if (e <= s) e += 48;
-                  return (
-                    booking.courtId === court.id &&
-                    secondHalfSlot >= s &&
-                    secondHalfSlot < Math.min(e, 48)
-                  );
-                });
-
-                const isStartFirst =
-                  firstHalfBooking &&
-                  getSlotIndex(firstHalfBooking.startTime) === firstHalfSlot;
-                const isStartSecond =
-                  secondHalfBooking &&
-                  getSlotIndex(secondHalfBooking.startTime) ===
-                    secondHalfSlot &&
-                  firstHalfBooking?.id !== secondHalfBooking?.id;
-
-                const getDisplayDuration = (booking: Booking) => {
-                  const s = getSlotIndex(booking.startTime);
-                  const e = getSlotIndex(booking.endTime);
-                  if (e <= s) return 48 - s;
-                  return e - s;
-                };
+                const isStart =
+                  slotBooking &&
+                  ((slotBooking.isOvernightBooking && slotBooking.endDate === currentDateStr && slotIndex === 0) ||
+                   (getSlotIndex(slotBooking.startTime) === slotIndex));
 
                 return (
                   <div
-                    key={`${court.id}-${time}`}
-                    className="court-cell-container"
+                    key={`${courtId}-${slotIndex}`}
+                    className={`court-cell-half ${
+                      slotBooking ? 'has-booking' : ''
+                    } ${slotBooking?.color || ''}`}
                     onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(courtId, slotIndex)}
                   >
-                    <div
-                      className={`court-cell-half first-half ${
-                        firstHalfBooking ? 'has-booking' : ''
-                      } ${firstHalfBooking?.color || ''}`}
-                      onDrop={() => handleDrop(court.id, firstHalfSlot)}
-                    >
-                      {isStartFirst && firstHalfBooking && (
-                        <BookingCard
-                          booking={firstHalfBooking}
-                          duration={getDisplayDuration(firstHalfBooking)}
-                          onDragStart={() =>
-                            handleDragStart(firstHalfBooking)
-                          }
-                        />
-                      )}
-                    </div>
-                    <div
-                      className={`court-cell-half second-half ${
-                        secondHalfBooking ? 'has-booking' : ''
-                      } ${secondHalfBooking?.color || ''}`}
-                      onDrop={() => handleDrop(court.id, secondHalfSlot)}
-                    >
-                      {isStartSecond && secondHalfBooking && (
-                        <BookingCard
-                          booking={secondHalfBooking}
-                          duration={getDisplayDuration(secondHalfBooking)}
-                          onDragStart={() =>
-                            handleDragStart(secondHalfBooking)
-                          }
-                        />
-                      )}
-                    </div>
+                    {isStart && slotBooking && (
+                      <BookingCard
+                        booking={slotBooking}
+                        duration={getDisplayDuration(slotBooking)}
+                        onDragStart={() => handleDragStart(slotBooking)}
+                        onViewDetails={handleViewDetails}
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -345,8 +353,18 @@ const ScheduleView = ({
           ))}
         </div>
       </div>
+
+      {/* Booking Details Modal */}
+      {selectedBooking && (
+        <BookingDetailsModal
+          isOpen={isDetailsModalOpen}
+          onClose={handleCloseDetailsModal}
+          booking={selectedBooking}
+          courtName={courts.find(c => (c.id || c._id) === selectedBooking.courtId)?.name}
+        />
+      )}
     </div>
   );
 };
 
-export default ScheduleView;
+export default React.memo(ScheduleView);

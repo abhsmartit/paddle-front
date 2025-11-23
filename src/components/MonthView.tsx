@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   format,
   startOfMonth,
@@ -189,4 +190,4 @@ const MonthView = ({ bookings, selectedDate, viewMode, onDateChange, onViewModeC
   );
 };
 
-export default MonthView;
+export default React.memo(MonthView);

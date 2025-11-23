@@ -10,4 +10,27 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Smooth transitions */
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Prevent layout shift during transitions */
+.main-content > * {
+  will-change: auto;
+}
+
+/* Optimize animations */
+.schedule-view,
+.week-view,
+.month-view {
+  animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

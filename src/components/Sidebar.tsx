@@ -12,8 +12,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-// 🚫 REMOVE this line:
-// import LanguageSwitcher from './LanguageSwitcher';
+import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -23,6 +22,7 @@ interface SidebarProps {
 
 const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const menuItems = [
     { id: 'schedule', label: t('schedule'), icon: Calendar, section: 'SCHEDULE' },
@@ -96,12 +96,17 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
 
       <div className="sidebar-footer">
         <div className="user-info">
-          <div className="user-avatar">H</div>
+          <div className="user-avatar">{user?.fullName?.charAt(0).toUpperCase() || 'A'}</div>
           <div className="user-details">
-            <div className="user-name">hadi</div>
-            <div className="user-email">hadi_mashamairgl</div>
+            <div className="user-name">{user?.fullName || 'Admin'}</div>
+            <div className="user-email">{user?.email || 'admin@padelclub.com'}</div>
           </div>
-          <LogOut size={18} className="logout-icon" />
+          <LogOut 
+            size={18} 
+            className="logout-icon" 
+            onClick={() => onItemClick('logout')}
+            style={{ cursor: 'pointer' }}
+          />
         </div>
       </div>
     </div>

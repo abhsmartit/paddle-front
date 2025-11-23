@@ -1,3 +1,4 @@
+import React from 'react';
 import { format, startOfWeek, addDays, parseISO } from 'date-fns';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { enUS, ar } from 'date-fns/locale';
@@ -246,4 +247,4 @@ const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onVi
   );
 };
 
-export default WeekView;
+export default React.memo(WeekView);
