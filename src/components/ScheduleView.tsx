@@ -175,7 +175,7 @@ const ScheduleView = ({
 
                 const getDisplayDuration = (booking: Booking) => {
                   const s = getSlotIndex(booking.startTime);
-                  let e = getSlotIndex(booking.endTime);
+                  const e = getSlotIndex(booking.endTime);
                   if (e <= s) return 48 - s;
                   return e - s;
                 };
