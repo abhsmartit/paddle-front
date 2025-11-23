@@ -1,91 +1,119 @@
 .header {
-  height: 80px;
-  background: #fff;
-  border-bottom: 1px solid #e5e5e5;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .menu-icon {
   cursor: pointer;
-  color: #666;
+  color: #4b5563;
 }
 
 .header-dropdowns {
   display: flex;
+  align-items: center;
   gap: 12px;
 }
 
+/* pill dropdowns (Padel Hub / Court 1) */
 .dropdown {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
-  background: #fff;
-  border: 1.5px solid #e5e5e5;
-  border-radius: 10px;
-  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  color: #111827;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
 }
 
-.dropdown:hover {
-  border-color: #2ecc71;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
-  transform: translateY(-1px);
-}
-
+/* RIGHT SIDE */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
 }
 
-.icon-button {
-  width: 44px;
-  height: 44px;
+/* language flag is already styled in LanguageSwitcher */
+
+/* + button */
+.icon-button.add-button {
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
-  background: #f8f9fa;
   border: none;
-  display: flex;
+  background: #22c55e;
+  color: #ffffff;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  color: #666;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.icon-button:hover {
-  background: #e8f5e9;
-  color: #2ecc71;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
-  transform: translateY(-2px);
+.icon-button.add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.45);
 }
 
-.add-button {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+/* ===== DROPDOWN MENU UNDER THE + BUTTON ===== */
+
+.add-button-wrapper {
+  position: relative;
 }
 
-.add-button:hover {
-  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
-  transform: translateY(-2px);
+/* the white box that appears on click */
+.add-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  padding: 8px 0;
+  min-width: 190px;
+  z-index: 40;
+}
+
+/* each row in the menu */
+.add-menu-item {
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.add-menu-item:hover {
+  background: #f3f4ff;
+  color: #4f46e5;
+}
+
+/* small arrow / rounded corners feel */
+.add-menu-item:first-child {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.add-menu-item:last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }

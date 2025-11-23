@@ -1,22 +1,16 @@
 // src/components/Header.tsx
-import {
-  ChevronDown,
-  Menu,
-  Plus,
-} from 'lucide-react';
+import React from 'react';
+import { ChevronDown, Menu, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import './Header.css';
 
 interface HeaderProps {
   selectedCourt: string;
-  onAddBooking?: () => void;
+  onAddBooking?: () => void; // opens Add Booking modal with tabs
 }
 
-const Header = ({
-  selectedCourt,
-  onAddBooking,
-}: HeaderProps) => {
+const Header = ({ selectedCourt, onAddBooking }: HeaderProps) => {
   const { t } = useTranslation();
 
   return (
@@ -36,13 +30,16 @@ const Header = ({
         </div>
       </div>
 
-      {/* RIGHT SIDE – language flag + add button */}
+      {/* RIGHT SIDE – language + + button */}
       <div className="header-right">
-        {/* Language flag (🇬🇧 / 🇸🇦) */}
         <LanguageSwitcher />
 
-        {/* Add booking */}
-        <button className="icon-button add-button" onClick={onAddBooking}>
+        {/* PLUS button – directly opens Add Booking modal */}
+        <button
+          className="icon-button add-button"
+          type="button"
+          onClick={onAddBooking}
+        >
           <Plus size={20} />
         </button>
       </div>

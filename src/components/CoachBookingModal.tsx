@@ -1,53 +1,52 @@
-// src/components/FixedBookingModal.tsx
+// src/components/CoachBookingModal.tsx
 import React, { useState } from 'react';
-import './FixedBookingModal.css';
+import './FixedBookingModal.css'; // reuse the same styles
+// if you prefer, you can duplicate the css to CoachBookingModal.css and import that instead
 
-interface FixedBookingFormValues {
+interface CoachBookingFormValues {
   bookingName: string;
   phoneNumber: string;
   duration: string;
-  paymentMethod: string;
   startingDate: string;
-  endDate: string;
   startingTime: string;
-  repeatedDay: string;
-  bookingType: string;
   pitch: string;
+  bookingType: string;
   bookingPrice: string;
   totalReceived: string;
-  isPaid: boolean;
+  paidAtStadium: boolean;
+  coach: string;
   bookingCategory: string;
   notes: string;
 }
 
-interface FixedBookingModalProps {
+interface CoachBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit?: (data: FixedBookingFormValues) => void;
+  onSubmit?: (data: CoachBookingFormValues) => void;
 }
 
-const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
+const CoachBookingModal: React.FC<CoachBookingModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
 }) => {
-  const [form, setForm] = useState<FixedBookingFormValues>({
+  const [form, setForm] = useState<CoachBookingFormValues>({
     bookingName: '',
     phoneNumber: '',
     duration: '60 minutes',
-    paymentMethod: 'Cash',
     startingDate: '',
-    endDate: '',
     startingTime: '',
-    repeatedDay: 'Friday',
+    pitch: 'Court 4',
     bookingType: 'By Owner',
-    pitch: '',
     bookingPrice: '',
     totalReceived: '',
-    isPaid: false,
+    paidAtStadium: false,
+    coach: '',
     bookingCategory: '',
     notes: '',
   });
+
+  const coaches = ['Coach 1', 'Coach 2', 'Coach 3']; // demo data
 
   if (!isOpen) return null;
 
@@ -59,7 +58,7 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
   };
 
   const handleTogglePaid = () => {
-    setForm((prev) => ({ ...prev, isPaid: !prev.isPaid }));
+    setForm((prev) => ({ ...prev, paidAtStadium: !prev.paidAtStadium }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,6 +70,7 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
   return (
     <div className="fixed-booking-backdrop">
       <div className="fixed-booking-modal">
+        {/* HEADER */}
         <div className="fixed-booking-header">
           <h2>Add Booking</h2>
           <button className="fixed-booking-close" onClick={onClose}>
@@ -78,17 +78,17 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
           </button>
         </div>
 
-        {/* Tabs row */}
+        {/* TABS ROW – Coach Bookings active */}
         <div className="fixed-booking-tabs">
           <button className="fixed-booking-tab">
             <span className="tab-icon">📅</span>
             <span>Single Bookings</span>
           </button>
-          <button className="fixed-booking-tab fixed-booking-tab--active">
+          <button className="fixed-booking-tab">
             <span className="tab-icon">🔁</span>
             <span>Fixed Bookings</span>
           </button>
-          <button className="fixed-booking-tab">
+          <button className="fixed-booking-tab fixed-booking-tab--active">
             <span className="tab-icon">🏋️‍♂️</span>
             <span>Coach Bookings</span>
           </button>
@@ -98,8 +98,9 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
           </button>
         </div>
 
+        {/* FORM */}
         <form className="fixed-booking-form" onSubmit={handleSubmit}>
-          {/* TOP ROW */}
+          {/* Booking name + phone */}
           <div className="fixed-booking-grid two-cols">
             <div className="fb-field">
               <label>Booking Name</label>
@@ -121,10 +122,31 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
                 onChange={handleChange}
                 placeholder="3x-xxx-xxxx"
               />
+              <small className="form-hint">
+                Search by name or phone number, or click the edit icon to enter
+                manually.
+              </small>
             </div>
           </div>
 
-          {/* DURATION + PAYMENT */}
+          {/* Coach select */}
+          <div className="fb-field">
+            <label>Coach</label>
+            <select
+              name="coach"
+              value={form.coach}
+              onChange={handleChange}
+            >
+              <option value="">Select coach</option>
+              {coaches.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Duration + starting time */}
           <div className="fixed-booking-grid two-cols">
             <div className="fb-field">
               <label>Duration</label>
@@ -140,20 +162,17 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             </div>
 
             <div className="fb-field">
-              <label>Payment Method</label>
-              <select
-                name="paymentMethod"
-                value={form.paymentMethod}
+              <label>Starting Time</label>
+              <input
+                type="time"
+                name="startingTime"
+                value={form.startingTime}
                 onChange={handleChange}
-              >
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="Transfer">Transfer</option>
-              </select>
+              />
             </div>
           </div>
 
-          {/* DATES */}
+          {/* Starting date + pitch */}
           <div className="fixed-booking-grid two-cols">
             <div className="fb-field">
               <label>Starting Date</label>
@@ -166,47 +185,23 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             </div>
 
             <div className="fb-field">
-              <label>End Date</label>
-              <input
-                type="date"
-                name="endDate"
-                value={form.endDate}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* TIME + REPEATED DAY */}
-          <div className="fixed-booking-grid two-cols">
-            <div className="fb-field">
-              <label>Starting Time</label>
-              <input
-                type="time"
-                name="startingTime"
-                value={form.startingTime}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="fb-field">
-              <label>Repeated Day</label>
+              <label>Select Pitch</label>
               <select
-                name="repeatedDay"
-                value={form.repeatedDay}
+                name="pitch"
+                value={form.pitch}
                 onChange={handleChange}
               >
-                <option>Sunday</option>
-                <option>Monday</option>
-                <option>Tuesday</option>
-                <option>Wednesday</option>
-                <option>Thursday</option>
-                <option>Friday</option>
-                <option>Saturday</option>
+                <option value="Court 1">Court 1</option>
+                <option value="Court 2">Court 2</option>
+                <option value="Court 3">Court 3</option>
+                <option value="Court 4">Court 4</option>
+                <option value="Court 5">Court 5</option>
+                <option value="Court 6">Court 6</option>
               </select>
             </div>
           </div>
 
-          {/* TYPE + PITCH */}
+          {/* Booking type + price / total received + toggle */}
           <div className="fixed-booking-grid two-cols">
             <div className="fb-field">
               <label>Booking Type</label>
@@ -221,26 +216,6 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             </div>
 
             <div className="fb-field">
-              <label>Select Pitch</label>
-              <select
-                name="pitch"
-                value={form.pitch}
-                onChange={handleChange}
-              >
-                <option value="">Select pitch</option>
-                <option value="Court 1">Court 1</option>
-                <option value="Court 2">Court 2</option>
-                <option value="Court 3">Court 3</option>
-                <option value="Court 4">Court 4</option>
-                <option value="Court 5">Court 5</option>
-                <option value="Court 6">Court 6</option>
-              </select>
-            </div>
-          </div>
-
-          {/* PRICE + RECEIVED */}
-          <div className="fixed-booking-grid two-cols">
-            <div className="fb-field">
               <label>Booking Price</label>
               <input
                 type="number"
@@ -249,9 +224,10 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
                 onChange={handleChange}
                 placeholder="220"
               />
-              <small>Total Bookings: SAR 0</small>
             </div>
+          </div>
 
+          <div className="fixed-booking-grid two-cols">
             <div className="fb-field">
               <label>Total Received</label>
               <input
@@ -262,10 +238,12 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
                 placeholder="0"
               />
               <div className="fb-paid-toggle">
-                <span>Paid</span>
+                <span>Paid at Stadium</span>
                 <button
                   type="button"
-                  className={`fb-switch ${form.isPaid ? 'fb-switch--on' : ''}`}
+                  className={`fb-switch ${
+                    form.paidAtStadium ? 'fb-switch--on' : ''
+                  }`}
                   onClick={handleTogglePaid}
                 >
                   <span className="fb-switch-thumb" />
@@ -274,7 +252,7 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             </div>
           </div>
 
-          {/* CATEGORY */}
+          {/* Category */}
           <div className="fb-field">
             <label>Booking Category</label>
             <select
@@ -289,7 +267,7 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             </select>
           </div>
 
-          {/* NOTES */}
+          {/* Notes */}
           <div className="fb-field">
             <label>Additional Notes</label>
             <textarea
@@ -301,7 +279,7 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
             />
           </div>
 
-          {/* FOOTER BUTTONS */}
+          {/* Footer buttons */}
           <div className="fixed-booking-footer">
             <button
               type="button"
@@ -320,4 +298,4 @@ const FixedBookingModal: React.FC<FixedBookingModalProps> = ({
   );
 };
 
-export default FixedBookingModal;
+export default CoachBookingModal;

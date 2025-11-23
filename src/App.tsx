@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -18,34 +19,38 @@ function App() {
   return (
     <div className="app">
       <Sidebar activeItem={activeMenuItem} onItemClick={setActiveMenuItem} />
+
       <div className="main-content">
         <Header
           selectedCourt="Court 1"
           onAddBooking={() => setIsBookingModalOpen(true)}
         />
+
         {viewMode === 'day' && (
-          <ScheduleView 
-            courts={courts} 
-            bookings={bookings} 
+          <ScheduleView
+            courts={courts}
+            bookings={bookings}
             selectedDate={selectedDate}
             viewMode={viewMode}
             onDateChange={setSelectedDate}
             onViewModeChange={setViewMode}
           />
         )}
+
         {viewMode === 'week' && (
-          <WeekView 
-            courts={courts} 
-            bookings={bookings} 
+          <WeekView
+            courts={courts}
+            bookings={bookings}
             selectedDate={selectedDate}
             viewMode={viewMode}
             onDateChange={setSelectedDate}
             onViewModeChange={setViewMode}
           />
         )}
+
         {viewMode === 'month' && (
-          <MonthView 
-            bookings={bookings} 
+          <MonthView
+            bookings={bookings}
             selectedDate={selectedDate}
             viewMode={viewMode}
             onDateChange={setSelectedDate}
@@ -53,6 +58,8 @@ function App() {
           />
         )}
       </div>
+
+      {/* Add Booking modal with tabs: Single / Fixed / Coach / Close */}
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}

@@ -356,3 +356,49 @@
   background: #2ecc71;
   color: #ffffff;
 }
+
+/* container already exists above, keep it */
+
+/* header row already there, keep it */
+
+/* GRID: 30-minute rows */
+.schedule-grid {
+  display: flex;
+  flex-direction: column;
+  background: #e0e0e0;
+}
+
+/* one row = time + all courts */
+.schedule-row {
+  display: grid;
+  grid-template-columns: 80px repeat(6, 1fr); /* 80px time column */
+  gap: 1px;
+}
+
+/* left time label */
+.time-slot {
+  background: #fff;
+  padding: 8px;
+  font-size: 12px;
+  color: #95a5a6;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;              /* 30-minute row */
+}
+
+/* each court cell for one 30-minute slot */
+.court-cell {
+  background: #fff;
+  position: relative;
+  height: 40px;              /* matches 30-min row */
+  border-bottom: 1px dashed #f1f2f6;
+  overflow: visible;         /* let tall booking cards overflow into rows below */
+}
+
+/* when a booking exists we keep background transparent,
+   booking card itself has the green / blue, etc */
+.court-cell.has-booking {
+  background: transparent;
+}

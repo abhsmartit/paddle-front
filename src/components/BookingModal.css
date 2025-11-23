@@ -1,4 +1,6 @@
-.modal-overlay {
+/* ===== BACKDROP / MODAL WRAPPER ===== */
+
+.bm-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,15 +16,11 @@
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.modal-content {
+.bm-modal {
   background: #ffffff;
   border-radius: 16px;
   width: 90%;
@@ -44,7 +42,9 @@
   }
 }
 
-.modal-header {
+/* ===== HEADER ===== */
+
+.bm-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,14 +52,14 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.modal-header h2 {
+.bm-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
   color: #0f172a;
 }
 
-.modal-close-button {
+.bm-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -72,12 +72,14 @@
   justify-content: center;
 }
 
-.modal-close-button:hover {
+.bm-close:hover {
   color: #0f172a;
   background: #f1f5f9;
 }
 
-.modal-tabs {
+/* ===== TABS ===== */
+
+.bm-tabs {
   display: flex;
   border-bottom: 1px solid #e2e8f0;
   padding: 0 32px;
@@ -85,7 +87,7 @@
   background: #f8fafc;
 }
 
-.modal-tab {
+.bm-tab {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -101,46 +103,46 @@
   white-space: nowrap;
 }
 
-.modal-tab:hover {
+.bm-tab:hover {
   color: #0f172a;
   background: rgba(99, 102, 241, 0.05);
 }
 
-.modal-tab.active {
+.bm-tab--active {
   color: #6366f1;
   border-bottom-color: #6366f1;
   background: rgba(99, 102, 241, 0.08);
 }
 
-.modal-tab svg {
-  flex-shrink: 0;
-}
+/* ===== FORM LAYOUT ===== */
 
-.modal-form {
+.bm-form {
   padding: 32px;
 }
 
-.form-row {
+/* grid rows like your old .form-row */
+.bm-grid.two-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin-bottom: 24px;
 }
 
-.form-group {
+.bm-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.form-group label {
+.bm-field label {
   font-size: 14px;
   font-weight: 500;
   color: #334155;
 }
 
-.form-group input,
-.form-group select {
+.bm-field input,
+.bm-field select,
+.bm-field textarea {
   padding: 12px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -150,77 +152,70 @@
   background: #ffffff;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.bm-field input:focus,
+.bm-field select:focus,
+.bm-field textarea:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-.form-group input::placeholder {
+.bm-field input::placeholder,
+.bm-field textarea::placeholder {
   color: #94a3b8;
 }
 
-.phone-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.phone-input-wrapper input {
-  flex: 1;
-  padding-right: 48px;
-}
-
-.search-icon-button {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
-  transition: transform 0.2s ease;
-}
-
-.search-icon-button:hover {
-  transform: scale(1.1);
-}
-
-.form-hint {
+.bm-field small {
   font-size: 12px;
   color: #64748b;
   margin-top: 4px;
-  line-height: 1.4;
 }
 
-.checkbox-group {
-  flex-direction: row;
-  align-items: center;
-}
+/* ===== PAID TOGGLE ===== */
 
-.checkbox-label {
+.bm-paid-toggle {
+  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #6366f1;
-}
-
-.checkbox-label span {
   font-size: 14px;
   font-weight: 500;
   color: #334155;
 }
 
-.modal-actions {
+.bm-switch {
+  width: 38px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: #d1d5db;
+  position: relative;
+  cursor: pointer;
+}
+
+.bm-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 999px;
+  transition: transform 0.2s ease;
+}
+
+.bm-switch--on {
+  background: #22c55e;
+}
+
+.bm-switch--on .bm-switch-thumb {
+  transform: translateX(18px);
+}
+
+/* ===== FOOTER BUTTONS ===== */
+
+.bm-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -229,8 +224,7 @@
   border-top: 1px solid #e2e8f0;
 }
 
-.btn-cancel,
-.btn-submit {
+.bm-btn {
   padding: 12px 24px;
   border-radius: 8px;
   font-size: 14px;
@@ -240,79 +234,77 @@
   border: none;
 }
 
-.btn-cancel {
+.bm-btn--ghost {
   background: #f1f5f9;
   color: #64748b;
 }
 
-.btn-cancel:hover {
+.bm-btn--ghost:hover {
   background: #e2e8f0;
   color: #334155;
 }
 
-.btn-submit {
+.bm-btn--primary {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.btn-submit:hover {
+.bm-btn--primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
-.btn-submit:active {
+.bm-btn--primary:active {
   transform: translateY(0);
 }
 
-/* Scrollbar styling for modal */
-.modal-content::-webkit-scrollbar {
+/* ===== SCROLLBAR ===== */
+
+.bm-modal::-webkit-scrollbar {
   width: 8px;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+.bm-modal::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.4);
   border-radius: 10px;
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
+.bm-modal::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.6);
 }
 
-.modal-content::-webkit-scrollbar-track {
+.bm-modal::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Responsive design */
+/* ===== RESPONSIVE ===== */
+
 @media (max-width: 768px) {
-  .modal-content {
+  .bm-modal {
     width: 95%;
     max-height: 95vh;
   }
 
-  .modal-header,
-  .modal-tabs,
-  .modal-form {
+  .bm-header,
+  .bm-tabs,
+  .bm-form {
     padding-left: 20px;
     padding-right: 20px;
   }
 
-  .form-row {
+  .bm-grid.two-cols {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .modal-tabs {
+  .bm-tabs {
     overflow-x: auto;
     gap: 4px;
   }
 
-  .modal-tab {
+  .bm-tab {
     padding: 12px 16px;
     font-size: 13px;
-  }
-
-  .modal-tab span {
-    display: none;
   }
 }
