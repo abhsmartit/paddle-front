@@ -1,51 +1,64 @@
+// BookingCard.tsx
+import React from 'react';
 import type { Booking } from '../types';
-import './BookingCard.css';
+import { Camera } from 'lucide-react';
 
 interface BookingCardProps {
   booking: Booking;
-  duration: number;        // in half-hour slots
-  onDragStart: () => void;
+  duration: number;
+  onDragStart: (booking: Booking) => void;
 }
 
-const BookingCard = ({ booking, duration, onDragStart }: BookingCardProps) => {
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    return `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
+// helper to show 01:00 PM style from "13:00"
+const formatTimeTo12Hour = (time: string) => {
+  const [hStr, mStr] = time.split(':');
+  const h = Number(hStr);
+  const m = Number(mStr || '0');
+  const period = h >= 12 ? 'PM' : 'AM';
+  const displayHour = h % 12 || 12;
+  const minute = m.toString().padStart(2, '0');
+  return `${displayHour}:${minute} ${period}`;
+};
 
-  // small day number for the calendar icon
-  let dayLabel = '';
-  try {
-    const d = new Date(booking.date);
-    if (!isNaN(d.getTime())) dayLabel = d.getDate().toString();
-  } catch {
-    dayLabel = '';
-  }
+const BookingCard: React.FC<BookingCardProps> = ({
+  booking,
+  duration,
+  onDragStart,
+}) => {
+  // 80px per hour => 40px per half hour (matches your grid)
+  const heightPerHalfHour = 40;
+  const cardHeight = duration * heightPerHalfHour;
+
+  // ✅ safely handle missing price, default to 300
+  const priceToShow = booking.price ?? 300;
 
   return (
     <div
-      className={`booking-card ${booking.color}`}
-      style={{
-        // vertical height = duration * 40px (half of the 80px hour)
-        height: `${duration * 40 - 4}px`,
-      }}
+      className={`booking-card ${booking.color || ''}`}
+      style={{ height: `${cardHeight}px` }}
       draggable
-      onDragStart={onDragStart}
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = 'move';
+        onDragStart(booking);
+      }}
     >
-      <div className="booking-icon">
-        <span className="booking-icon-day">{dayLabel}</span>
+      {/* LEFT STRIP: icon top, price bottom */}
+      <div className="booking-card-left">
+        <div className="booking-card-icon">
+          <Camera size={16} />
+        </div>
+        <div className="booking-card-price">
+          {priceToShow} SAR
+        </div>
       </div>
 
-      <div className="booking-content">
-        <div className="booking-name">{booking.playerName}</div>
-        <div className="booking-time">
-          {formatTime(booking.startTime)} – {formatTime(booking.endTime)}
+      {/* MAIN AREA: name + time (NO DATE) */}
+      <div className="booking-card-main">
+        <div className="booking-card-name">{booking.playerName}</div>
+        <div className="booking-card-time">
+          {formatTimeTo12Hour(booking.startTime)} –{' '}
+          {formatTimeTo12Hour(booking.endTime)}
         </div>
-        {booking.status && (
-          <div className="booking-status">{booking.status}</div>
-        )}
       </div>
     </div>
   );
