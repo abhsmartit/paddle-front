@@ -1,0 +1,19 @@
+<svg width="500" height="140" viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .padel-green { fill: #6BB86E; }
+      .padel-dark { fill: #2C3E50; }
+    </style>
+  </defs>
+  
+  <!-- THE PADEL Text -->
+  <text x="250" y="45" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" class="padel-green">THE PADEL</text>
+  
+  <!-- HUB Text -->
+  <text x="60" y="110" font-family="Arial, sans-serif" font-size="52" font-weight="bold" text-anchor="start" class="padel-dark">H</text>
+  <text x="135" y="110" font-family="Arial, sans-serif" font-size="52" font-weight="bold" text-anchor="start" class="padel-dark">U</text>
+  <text x="210" y="110" font-family="Arial, sans-serif" font-size="52" font-weight="bold" text-anchor="start" class="padel-dark">B</text>
+  
+  <!-- Decorative U shape accent in the U of HUB -->
+  <path d="M 145 80 Q 145 95 170 95 Q 195 95 195 80" fill="none" stroke="#6BB86E" stroke-width="5" stroke-linecap="round"/>
+</svg>

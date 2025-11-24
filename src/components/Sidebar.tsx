@@ -15,6 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 
+// ✅ ADD THIS IMPORT FOR YOUR LOGO IMAGE
+import padelHubLogo from '../assets/padel-logo.svg';
+
 interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
@@ -46,7 +49,12 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="logo">
-          <div className="logo-icon">🎾</div>
+          {/* 🎾 replaced with your logo image, same spot/size */}
+          <img
+            src={padelHubLogo}
+            alt="The Padel Hub"
+            className="logo-image"
+          />
         </div>
       </div>
 

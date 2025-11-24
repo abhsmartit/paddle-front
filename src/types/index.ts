@@ -23,7 +23,7 @@ export interface Booking {
   phone?: string;
   paymentStatus?: 'PENDING' | 'PARTIAL' | 'PAID';
   categoryName?: string;
-  bookingType?: 'SINGLE' | 'TEAM' | 'TOURNAMENT';
+  bookingType?: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
 }
 
 export type ViewMode = 'day' | 'week' | 'month';
@@ -64,9 +64,10 @@ export interface ApiBooking {
   clubId: string;
   courtId: string;
   customerId?: string;
+  coachId?: string;
   bookingName: string;
   phone: string;
-  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT';
+  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
   bookingSource: 'SCHEDULED' | 'ONLINE' | 'FIXED';
   startDateTime: string;
   endDateTime: string;
@@ -75,6 +76,7 @@ export interface ApiBooking {
   categoryName?: string;
   categoryColor?: string;
   paymentStatus: 'PENDING' | 'PARTIAL' | 'PAID';
+  notes?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -93,13 +95,32 @@ export interface ApiDaySchedule {
 export interface CreateBookingRequest {
   courtId: string;
   customerId?: string;
+  coachId?: string;
   bookingName: string;
   phone: string;
-  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT';
+  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
   startDateTime: string;
   endDateTime: string;
   price: number;
   bookingCategoryId?: string;
+  notes?: string;
+}
+
+export interface CreateFixedBookingRequest {
+  courtId: string;
+  customerId?: string;
+  bookingName: string;
+  phone: string;
+  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT';
+  startTime: string;
+  duration: number;
+  startDate: string;
+  endDate: string;
+  repeatedDay: string;
+  price: number;
+  paymentMethod: string;
+  bookingCategoryId?: string;
+  notes?: string;
 }
 
 export interface Customer {
@@ -109,6 +130,20 @@ export interface Customer {
   phone: string;
   email?: string;
   notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Coach {
+  _id: string;
+  id?: string;
+  clubId: string;
+  name: string;
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  specialization?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }

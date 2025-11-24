@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Calendar, Repeat, Dumbbell, Home } from 'lucide-react';
 import { apiService } from '../services/api';
-import type { Court, ApiBookingCategory, CreateBookingRequest } from '../types';
+import type { Court, ApiBookingCategory, CreateBookingRequest, CreateFixedBookingRequest, Customer, Coach } from '../types';
 import './BookingModal.css';
 
 interface BookingModalProps {
@@ -25,7 +25,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
     selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
   );
   const [selectedCourt, setSelectedCourt] = useState('');
-  const [bookingType, setBookingType] = useState<'SINGLE' | 'TEAM' | 'TOURNAMENT'>('SINGLE');
+  const [bookingType, setBookingType] = useState<'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH'>('SINGLE');
   const [bookingPrice, setBookingPrice] = useState('');
   const [totalReceived, setTotalReceived] = useState('');
   const [paidAtStadium, setPaidAtStadium] = useState(false);
@@ -33,12 +33,43 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
   const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  
+  // Fixed booking specific states
+  const [endDate, setEndDate] = useState('');
+  const [repeatedDay, setRepeatedDay] = useState('Friday');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [notes, setNotes] = useState('');
+  
+  // Coach booking specific states
+  const [selectedCoach, setSelectedCoach] = useState('');
+  const [coaches, setCoaches] = useState<Coach[]>([]);
+
+  const loadCategories = useCallback(async () => {
+    try {
+      const categoriesData = await apiService.getBookingCategories(clubId);
+      setCategories(categoriesData);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+    }
+  }, [clubId]);
+
+  const loadCoaches = useCallback(async () => {
+    try {
+      const coachesData = await apiService.getCoaches(clubId);
+      setCoaches(coachesData);
+    } catch (err) {
+      console.error('Failed to load coaches:', err);
+    }
+  }, [clubId]);
 
   useEffect(() => {
     if (isOpen && clubId) {
       loadCategories();
+      if (activeTab === 'coach') {
+        loadCoaches();
+      }
       // Set default court if available
       if (courts.length > 0 && !selectedCourt) {
         setSelectedCourt(courts[0].id || courts[0]._id || '');
@@ -52,7 +83,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
         }
       }
     }
-  }, [isOpen, clubId, courts]);
+  }, [isOpen, clubId, courts, activeTab, loadCategories, loadCoaches, selectedCourt, bookingPrice, duration]);
 
   useEffect(() => {
     // Recalculate price when court or duration changes
@@ -65,15 +96,6 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       }
     }
   }, [selectedCourt, duration, courts]);
-
-  const loadCategories = async () => {
-    try {
-      const categoriesData = await apiService.getBookingCategories(clubId);
-      setCategories(categoriesData);
-    } catch (err) {
-      console.error('Failed to load categories:', err);
-    }
-  };
 
   const searchCustomer = async () => {
     if (!phoneNumber || phoneNumber.length < 3) return;
@@ -138,6 +160,20 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       return;
     }
 
+    // Additional validation for fixed bookings
+    if (activeTab === 'fixed' && !endDate) {
+      setError('End date is required for fixed bookings');
+      setLoading(false);
+      return;
+    }
+
+    // Additional validation for coach bookings
+    if (activeTab === 'coach' && !selectedCoach) {
+      setError('Please select a coach');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Parse start time (format: HH:mm)
       const [hours, minutes] = startTime.split(':').map(Number);
@@ -148,26 +184,85 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       const endDateTime = new Date(startDateTime);
       endDateTime.setMinutes(endDateTime.getMinutes() + parseInt(duration));
 
-      const bookingData: CreateBookingRequest = {
-        courtId: selectedCourt,
-        bookingName: bookingName.trim(),
-        phone: phoneNumber.trim(),
-        bookingType: bookingType,
-        startDateTime: startDateTime.toISOString(),
-        endDateTime: endDateTime.toISOString(),
-        price: parseFloat(bookingPrice),
-      };
+      if (activeTab === 'single') {
+        // Single booking
+        const bookingData: CreateBookingRequest = {
+          courtId: selectedCourt,
+          bookingName: bookingName.trim(),
+          phone: phoneNumber.trim(),
+          bookingType: bookingType,
+          startDateTime: startDateTime.toISOString(),
+          endDateTime: endDateTime.toISOString(),
+          price: parseFloat(bookingPrice),
+        };
 
-      // Add optional fields
-      if (selectedCustomerId) {
-        bookingData.customerId = selectedCustomerId;
+        // Add optional fields
+        if (selectedCustomerId) {
+          bookingData.customerId = selectedCustomerId;
+        }
+
+        if (selectedCategory) {
+          bookingData.bookingCategoryId = selectedCategory;
+        }
+
+        if (notes) {
+          bookingData.notes = notes;
+        }
+
+        await apiService.createBooking(clubId, bookingData);
+      } else if (activeTab === 'fixed') {
+        // Fixed booking
+        const fixedBookingData: CreateFixedBookingRequest = {
+          courtId: selectedCourt,
+          bookingName: bookingName.trim(),
+          phone: phoneNumber.trim(),
+          bookingType: bookingType === 'COACH' ? 'SINGLE' : bookingType,
+          startTime: startTime,
+          duration: parseInt(duration),
+          startDate: startingDate,
+          endDate: endDate,
+          repeatedDay: repeatedDay,
+          price: parseFloat(bookingPrice),
+          paymentMethod: paymentMethod,
+          notes: notes,
+        };
+
+        if (selectedCustomerId) {
+          fixedBookingData.customerId = selectedCustomerId;
+        }
+
+        if (selectedCategory) {
+          fixedBookingData.bookingCategoryId = selectedCategory;
+        }
+
+        await apiService.createFixedBooking(clubId, fixedBookingData);
+      } else if (activeTab === 'coach') {
+        // Coach booking - uses same endpoint as single booking but with COACH type
+        const coachBookingData: CreateBookingRequest = {
+          courtId: selectedCourt,
+          coachId: selectedCoach,
+          bookingName: bookingName.trim(),
+          phone: phoneNumber.trim(),
+          bookingType: 'COACH',
+          startDateTime: startDateTime.toISOString(),
+          endDateTime: endDateTime.toISOString(),
+          price: parseFloat(bookingPrice),
+        };
+
+        if (selectedCustomerId) {
+          coachBookingData.customerId = selectedCustomerId;
+        }
+
+        if (selectedCategory) {
+          coachBookingData.bookingCategoryId = selectedCategory;
+        }
+
+        if (notes) {
+          coachBookingData.notes = notes;
+        }
+
+        await apiService.createBooking(clubId, coachBookingData);
       }
-
-      if (selectedCategory) {
-        bookingData.bookingCategoryId = selectedCategory;
-      }
-
-      await apiService.createBooking(clubId, bookingData);
       
       // Handle payment if received
       if (totalReceived && parseFloat(totalReceived) > 0) {
@@ -176,16 +271,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       }
 
       // Reset form
-      setBookingName('');
-      setPhoneNumber('');
-      setDuration('60');
-      setStartTime('17:30');
-      setBookingPrice('');
-      setTotalReceived('');
-      setPaidAtStadium(false);
-      setSelectedCategory('');
-      setSelectedCustomerId('');
-      setError(null);
+      resetForm();
 
       // Call the callback if provided
       if (onBookingCreated) {
@@ -193,12 +279,31 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       }
 
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to create booking:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to create booking');
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || 'Failed to create booking');
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setBookingName('');
+    setPhoneNumber('');
+    setDuration('60');
+    setStartTime('17:30');
+    setBookingPrice('');
+    setTotalReceived('');
+    setPaidAtStadium(false);
+    setSelectedCategory('');
+    setSelectedCustomerId('');
+    setEndDate('');
+    setRepeatedDay('Friday');
+    setPaymentMethod('Cash');
+    setNotes('');
+    setSelectedCoach('');
+    setError(null);
   };
 
   return (
@@ -241,6 +346,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
             </div>
           )}
 
+          {/* Common fields for all booking types */}
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="bookingName">Booking Name *</label>
@@ -279,6 +385,28 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
               </small>
             </div>
           </div>
+
+          {/* Coach Booking specific: Coach selection */}
+          {activeTab === 'coach' && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="coach">Coach *</label>
+                <select
+                  id="coach"
+                  value={selectedCoach}
+                  onChange={(e) => setSelectedCoach(e.target.value)}
+                  required
+                >
+                  <option value="">Select coach</option>
+                  {coaches.map((coach) => (
+                    <option key={coach._id || coach.id} value={coach._id || coach.id}>
+                      {coach.name || coach.fullName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           <div className="form-row">
             <div className="form-group">
@@ -321,55 +449,149 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="selectPitch">Select Court *</label>
-              <select
-                id="selectPitch"
-                value={selectedCourt}
-                onChange={(e) => setSelectedCourt(e.target.value)}
-                required
-              >
-                <option value="">Choose a court</option>
-                {courts.map((court) => (
-                  <option key={court.id || court._id} value={court.id || court._id}>
-                    {court.name} {court.isActive === false ? '(Inactive)' : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Fixed Booking specific: End Date */}
+            {activeTab === 'fixed' ? (
+              <div className="form-group">
+                <label htmlFor="endDate">End Date *</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  required
+                />
+              </div>
+            ) : (
+              <div className="form-group">
+                <label htmlFor="selectPitch">Select Court *</label>
+                <select
+                  id="selectPitch"
+                  value={selectedCourt}
+                  onChange={(e) => setSelectedCourt(e.target.value)}
+                  required
+                >
+                  <option value="">Choose a court</option>
+                  {courts.map((court) => (
+                    <option key={court.id || court._id} value={court.id || court._id}>
+                      {court.name} {court.isActive === false ? '(Inactive)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="bookingType">Booking Type *</label>
-              <select
-                id="bookingType"
-                value={bookingType}
-                onChange={(e) => setBookingType(e.target.value as 'SINGLE' | 'TEAM' | 'TOURNAMENT')}
-                required
-              >
-                <option value="SINGLE">Single</option>
-                <option value="TEAM">Team</option>
-                <option value="TOURNAMENT">Tournament</option>
-              </select>
-            </div>
+          {/* Fixed Booking specific: Repeated Day and Court selection in second row */}
+          {activeTab === 'fixed' && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="repeatedDay">Repeated Day *</label>
+                <select
+                  id="repeatedDay"
+                  value={repeatedDay}
+                  onChange={(e) => setRepeatedDay(e.target.value)}
+                  required
+                >
+                  <option value="Sunday">Sunday</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="category">Category (Optional)</label>
-              <select
-                id="category"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="">No Category</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <div className="form-group">
+                <label htmlFor="selectPitch">Select Court *</label>
+                <select
+                  id="selectPitch"
+                  value={selectedCourt}
+                  onChange={(e) => setSelectedCourt(e.target.value)}
+                  required
+                >
+                  <option value="">Choose a court</option>
+                  {courts.map((court) => (
+                    <option key={court.id || court._id} value={court.id || court._id}>
+                      {court.name} {court.isActive === false ? '(Inactive)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Single and Fixed bookings: Booking Type row */}
+          {activeTab !== 'coach' && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="bookingType">Booking Type *</label>
+                <select
+                  id="bookingType"
+                  value={bookingType}
+                  onChange={(e) => setBookingType(e.target.value as 'SINGLE' | 'TEAM' | 'TOURNAMENT')}
+                  required
+                >
+                  <option value="SINGLE">Single</option>
+                  <option value="TEAM">Team</option>
+                  <option value="TOURNAMENT">Tournament</option>
+                </select>
+              </div>
+
+              {activeTab === 'fixed' ? (
+                <div className="form-group">
+                  <label htmlFor="paymentMethod">Payment Method *</label>
+                  <select
+                    id="paymentMethod"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    required
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="Card">Card</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                  </select>
+                </div>
+              ) : (
+                <div className="form-group">
+                  <label htmlFor="category">Category (Optional)</label>
+                  <select
+                    id="category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                  >
+                    <option value="">No Category</option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Category for Coach and Fixed bookings */}
+          {(activeTab === 'coach' || activeTab === 'fixed') && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="category">Category (Optional)</label>
+                <select
+                  id="category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                >
+                  <option value="">No Category</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           <div className="form-row">
             <div className="form-group">
@@ -412,6 +634,23 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
               </label>
             </div>
           </div>
+
+          {/* Additional Notes for Fixed and Coach bookings */}
+          {(activeTab === 'fixed' || activeTab === 'coach') && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="notes">Additional Notes</label>
+                <textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Write notes here…"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="modal-actions">
             <button type="button" className="btn-cancel" onClick={onClose} disabled={loading}>

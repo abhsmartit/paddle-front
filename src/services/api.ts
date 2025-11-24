@@ -131,6 +131,11 @@ export const apiService = {
     return response.data;
   },
 
+  createFixedBooking: async (clubId: string, data: any) => {
+    const response = await api.post(`/clubs/${clubId}/bookings/fixed`, data);
+    return response.data;
+  },
+
   updateBooking: async (clubId: string, bookingId: string, data: any) => {
     const response = await api.patch(`/clubs/${clubId}/bookings/${bookingId}`, data);
     return response.data;
@@ -167,6 +172,22 @@ export const apiService = {
 
   updateCustomer: async (customerId: string, data: any) => {
     const response = await api.patch(`/customers/${customerId}`, data);
+    return response.data;
+  },
+
+  // Coach endpoints
+  getCoaches: async (clubId: string) => {
+    const response = await api.get(`/clubs/${clubId}/coaches`);
+    return response.data;
+  },
+
+  createCoach: async (clubId: string, data: any) => {
+    const response = await api.post(`/clubs/${clubId}/coaches`, data);
+    return response.data;
+  },
+
+  updateCoach: async (coachId: string, data: any) => {
+    const response = await api.patch(`/coaches/${coachId}`, data);
     return response.data;
   },
 

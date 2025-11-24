@@ -33,6 +33,12 @@
   gap: 10px;
 }
 
+.logo-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
 .logo-icon {
   width: 36px;
   height: 36px;
