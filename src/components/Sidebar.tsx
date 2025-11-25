@@ -15,8 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 
-// ✅ ADD THIS IMPORT FOR YOUR LOGO IMAGE
-import padelHubLogo from '../assets/padel-logo.svg';
+// ✅ Use your EXACT uploaded image
+import padelHubLogo from "../assets/image.png";
 
 interface SidebarProps {
   activeItem: string;
@@ -49,7 +49,7 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="logo">
-          {/* 🎾 replaced with your logo image, same spot/size */}
+          {/* 🎾 EXACT uploaded logo, perfect alignment */}
           <img
             src={padelHubLogo}
             alt="The Padel Hub"
@@ -109,9 +109,9 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
             <div className="user-name">{user?.fullName || 'Admin'}</div>
             <div className="user-email">{user?.email || 'admin@padelclub.com'}</div>
           </div>
-          <LogOut 
-            size={18} 
-            className="logout-icon" 
+          <LogOut
+            size={18}
+            className="logout-icon"
             onClick={() => onItemClick('logout')}
             style={{ cursor: 'pointer' }}
           />
