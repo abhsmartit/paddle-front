@@ -69,7 +69,14 @@ const MonthView = ({ bookings, selectedDate, viewMode, onDateChange, onViewModeC
 
   const getBookingsForDay = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return bookings.filter((b) => b.date === dateStr);
+    // Include bookings that:
+    // 1. Start on this date
+    // 2. Are overnight bookings that end on this date
+    return bookings.filter((b) => {
+      const startsOnDate = b.date === dateStr;
+      const endsOnDate = b.isOvernightBooking && b.endDate === dateStr;
+      return startsOnDate || endsOnDate;
+    });
   };
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {

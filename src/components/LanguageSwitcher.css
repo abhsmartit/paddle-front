@@ -6,6 +6,9 @@
 }
 
 .flag-icon {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

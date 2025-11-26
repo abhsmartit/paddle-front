@@ -1,5 +1,5 @@
 import React from 'react';
-import { format, startOfWeek, addDays, parseISO } from 'date-fns';
+import { format, startOfWeek, addDays } from 'date-fns';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { enUS, ar } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
@@ -52,29 +52,24 @@ const formatTime = (time: string): string => {
 /**
  * Decide on which days an overnight booking should appear.
  * - Normal booking → one segment on its own date
- * - 23:00 → 02:00 → one segment on start date (23rd) AND one on next date (24th)
+ * - Overnight booking (isOvernightBooking=true) → one segment on start date AND one on end date
  *
  * IMPORTANT: we DO NOT change the times; labels still use booking.startTime / endTime.
  */
 const createSegments = (booking: Booking): BookingSegment[] => {
-  const bookingDate = parseISO(booking.date);
-  const baseDayStr = format(bookingDate, 'yyyy-MM-dd');
+  const baseDayStr = booking.date; // Already in YYYY-MM-DD format
 
-  const startIndex = getSlotIndex(booking.startTime);
-  const endIndex = getSlotIndex(booking.endTime);
-
-  // same-day booking
-  if (endIndex > startIndex) {
-    return [{ booking, dayStr: baseDayStr }];
+  // Check if it's an overnight booking
+  if (booking.isOvernightBooking && booking.endDate) {
+    // Show on both start day and end day
+    return [
+      { booking, dayStr: baseDayStr },
+      { booking, dayStr: booking.endDate },
+    ];
   }
 
-  // overnight booking: show on start day + next day
-  const nextDayStr = format(addDays(bookingDate, 1), 'yyyy-MM-dd');
-
-  return [
-    { booking, dayStr: baseDayStr },
-    { booking, dayStr: nextDayStr },
-  ];
+  // Same-day booking: show only on start date
+  return [{ booking, dayStr: baseDayStr }];
 };
 
 const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onViewModeChange }: WeekViewProps) => {

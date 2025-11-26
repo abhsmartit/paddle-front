@@ -31,18 +31,17 @@ export default function Dashboard() {
   useEffect(() => {
     if (!clubId) return;
 
-    // Only reload data when date changes or on initial mount
+    // Reload data when date changes, view mode changes, or on initial mount
     const dateChanged = prevDateRef.current.toDateString() !== selectedDate.toDateString();
+    const viewModeChanged = prevViewModeRef.current !== viewMode;
     
-    if (isInitialMount.current || dateChanged) {
+    if (isInitialMount.current || dateChanged || viewModeChanged) {
       loadData();
       isInitialMount.current = false;
       prevDateRef.current = selectedDate;
+      prevViewModeRef.current = viewMode;
     }
-    
-    // Update refs without triggering reload
-    prevViewModeRef.current = viewMode;
-  }, [clubId, selectedDate]);
+  }, [clubId, selectedDate, viewMode]);
 
   const loadData = useCallback(async () => {
     if (!clubId) return;
@@ -66,9 +65,20 @@ export default function Dashboard() {
       setCourts(transformedCourts);
 
       // Fetch bookings based on view mode
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      let scheduleResponse: ApiScheduleCourtBooking[];
       
-      const scheduleResponse: ApiScheduleCourtBooking[] = await apiService.getDaySchedule(clubId, dateStr);
+      if (viewMode === 'day') {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        scheduleResponse = await apiService.getDaySchedule(clubId, dateStr);
+      } else if (viewMode === 'week') {
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        scheduleResponse = await apiService.getWeekSchedule(clubId, dateStr);
+      } else {
+        // month view
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth() + 1; // getMonth() returns 0-11
+        scheduleResponse = await apiService.getMonthSchedule(clubId, year, month);
+      }
       
       // Transform API data to match component expectations
       const allBookings: Booking[] = (scheduleResponse || []).flatMap((courtSchedule) => 
@@ -114,15 +124,25 @@ export default function Dashboard() {
         })
       );
       
-      // Filter bookings that match the selected date
-      // Include bookings that:
-      // 1. Start on the selected date
-      // 2. Are overnight bookings that end on the selected date
-      const filteredBookings = allBookings.filter(booking => {
-        const startsOnDate = booking.date === dateStr;
-        const endsOnDate = booking.isOvernightBooking && booking.endDate === dateStr;
-        return startsOnDate || endsOnDate;
-      });
+      // Filter bookings based on view mode
+      let filteredBookings: Booking[];
+      
+      if (viewMode === 'day') {
+        // For day view: filter bookings that match the selected date
+        // Include bookings that:
+        // 1. Start on the selected date
+        // 2. Are overnight bookings that end on the selected date
+        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        filteredBookings = allBookings.filter(booking => {
+          const startsOnDate = booking.date === dateStr;
+          const endsOnDate = booking.isOvernightBooking && booking.endDate === dateStr;
+          return startsOnDate || endsOnDate;
+        });
+      } else {
+        // For week and month views: use all bookings from API
+        // The API already returns filtered data for the appropriate range
+        filteredBookings = allBookings;
+      }
       
       setBookings(filteredBookings);
     } catch (error: any) {
