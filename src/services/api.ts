@@ -131,8 +131,8 @@ export const apiService = {
     return response.data;
   },
 
-  createFixedBooking: async (clubId: string, data: any) => {
-    const response = await api.post(`/clubs/${clubId}/bookings/fixed`, data);
+  createFixedBooking: async (clubId: string, data: CreateFixedBookingRequest) => {
+    const response = await api.post(`/clubs/${clubId}/bookings`, data);
     return response.data;
   },
 

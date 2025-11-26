@@ -134,6 +134,32 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
               </div>
             )}
 
+            {booking.bookingType === 'FIXED' && booking.repeatedDaysOfWeek && (
+              <div className="booking-details-row">
+                <div className="booking-details-icon">
+                  <Calendar size={18} />
+                </div>
+                <div className="booking-details-info">
+                  <div className="booking-details-label">Repeated Days</div>
+                  <div className="booking-details-value">
+                    {booking.repeatedDaysOfWeek.join(', ')}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {booking.bookingType === 'FIXED' && booking.recurrenceEndDate && (
+              <div className="booking-details-row">
+                <div className="booking-details-icon">
+                  <Calendar size={18} />
+                </div>
+                <div className="booking-details-info">
+                  <div className="booking-details-label">Recurrence End Date</div>
+                  <div className="booking-details-value">{booking.recurrenceEndDate}</div>
+                </div>
+              </div>
+            )}
+
             <div className="booking-details-row">
               <div className="booking-details-icon">
                 <CreditCard size={18} />
