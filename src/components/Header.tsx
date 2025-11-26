@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeSwitcher from './ThemeSwitcher';   // ✅ add this import
 import './Header.css';
 
 interface HeaderProps {
@@ -36,12 +37,11 @@ const Header = ({
         </div>
       </div>
 
-      {/* RIGHT SIDE – language flag + add button */}
+      {/* RIGHT SIDE – language flag + theme + add button */}
       <div className="header-right">
-        {/* Language flag (🇬🇧 / 🇸🇦) */}
         <LanguageSwitcher />
+        <ThemeSwitcher />
 
-        {/* Add booking */}
         <button className="icon-button add-button" onClick={onAddBooking}>
           <Plus size={20} />
         </button>
