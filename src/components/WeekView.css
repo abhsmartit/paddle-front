@@ -2,7 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f4f6fb;
+  background: var(--bg-body, #f4f6fb);
   overflow: hidden;
   height: 100%;
 }
@@ -14,8 +14,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg-surface, #ffffff);
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
   gap: 24px;
   flex-shrink: 0;
 }
@@ -30,21 +30,21 @@
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background: #fff;
-  border: 1.5px solid #e5e5e5;
+  background: var(--bg-surface, #fff);
+  border: 1.5px solid var(--border-subtle, #e5e5e5);
   border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-main, #334155);
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .schedule-nav-button:hover {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.04);
-  color: #6366f1;
+  border-color: var(--accent, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.04));
+  color: var(--accent, #6366f1);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
 }
@@ -54,13 +54,13 @@
   align-items: center;
   gap: 8px;
   padding: 10px 24px;
-  background: #fafbff;
-  border: 1.5px solid #e2e8f0;
+  background: var(--bg-elevated, #fafbff);
+  border: 1.5px solid var(--border-subtle, #e2e8f0);
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-main, #0f172a);
   min-width: 220px;
   justify-content: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -68,21 +68,21 @@
 }
 
 .schedule-date-display:hover {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.04);
-  color: #6366f1;
+  border-color: var(--accent, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.04));
+  color: var(--accent, #6366f1);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
 }
 
 .schedule-view-mode-selector {
   display: flex;
-  background: #f8fafc;
+  background: var(--bg-elevated, #f8fafc);
   border-radius: 8px;
   padding: 4px;
   gap: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf2f7;
+  border: 1px solid var(--border-subtle, #edf2f7);
 }
 
 .schedule-view-mode-button {
@@ -93,26 +93,26 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .schedule-view-mode-button:hover {
-  color: #0f172a;
-  background: rgba(99, 102, 241, 0.08);
+  color: var(--text-main, #0f172a);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.08));
 }
 
 .schedule-view-mode-button.active {
-  background: #ffffff;
-  color: #6366f1;
+  background: var(--bg-surface, #ffffff);
+  color: var(--accent, #6366f1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .week-container {
   flex: 1;
   overflow: auto;
-  background: #fff;
+  background: var(--bg-surface, #fff);
   margin: 16px 24px 24px 24px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
@@ -125,31 +125,31 @@
   display: grid;
   grid-template-columns: 150px repeat(7, minmax(140px, 1fr));
   gap: 1px;
-  background: #e2e8f0;
-  border-bottom: 2px solid #e2e8f0;
+  background: var(--border-subtle, #e2e8f0);
+  border-bottom: 2px solid var(--border-subtle, #e2e8f0);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .time-column-header {
-  background: #f8fafc;
+  background: var(--bg-elevated, #f8fafc);
   padding: 16px;
   font-weight: 600;
   font-size: 13px;
-  color: #334155;
+  color: var(--text-main, #334155);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border-subtle, #e2e8f0);
 }
 
 .day-header {
-  background: #ffffff;
+  background: var(--bg-surface, #ffffff);
   padding: 14px 12px;
   text-align: center;
   transition: all 0.2s ease;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border-subtle, #e2e8f0);
 }
 
 .day-header:last-child {
@@ -157,14 +157,14 @@
 }
 
 .day-header.active {
-  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-  border-bottom: 3px solid #6366f1;
+  background: var(--accent-soft, linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%));
+  border-bottom: 3px solid var(--accent, #6366f1);
 }
 
 .day-name {
   font-weight: 600;
   font-size: 13px;
-  color: #334155;
+  color: var(--text-main, #334155);
   margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -172,7 +172,7 @@
 
 .day-date {
   font-size: 12px;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   font-weight: 500;
 }
 
@@ -188,43 +188,43 @@
   display: grid;
   grid-template-columns: 150px repeat(7, minmax(140px, 1fr));
   gap: 1px;
-  background: #e2e8f0;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--border-subtle, #e2e8f0);
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
 }
 
 .court-label {
-  background: #f8fafc;
+  background: var(--bg-elevated, #f8fafc);
   padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100px;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border-subtle, #e2e8f0);
 }
 
 .court-label .court-name {
   font-weight: 600;
   font-size: 13px;
-  color: #334155;
+  color: var(--text-main, #334155);
   margin-bottom: 4px;
 }
 
 .court-label .court-capacity {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   font-weight: 500;
 }
 
 .week-day-cell {
-  background: #fff;
+  background: var(--bg-surface, #fff);
   padding: 10px 8px;
   min-height: 100px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   overflow-y: auto;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border-subtle, #e2e8f0);
 }
 
 .week-day-cell:last-child {
@@ -313,6 +313,6 @@
 .week-container::-webkit-scrollbar-track,
 .week-courts::-webkit-scrollbar-track,
 .week-day-cell::-webkit-scrollbar-track {
-  background: rgba(248, 250, 252, 0.5);
+  background: var(--bg-elevated, rgba(248, 250, 252, 0.5));
   border-radius: 10px;
 }

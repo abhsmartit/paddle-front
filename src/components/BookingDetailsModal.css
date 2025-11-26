@@ -13,7 +13,7 @@
 }
 
 .booking-details-modal {
-  background: #ffffff;
+  background: var(--bg-surface, #ffffff);
   border-radius: 16px;
   width: 90%;
   max-width: 500px;
@@ -41,7 +41,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--border-subtle, #e5e5e5);
   background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   color: white;
 }
@@ -96,7 +96,7 @@
 }
 
 .booking-details-row:hover {
-  background: #f8f9fa;
+  background: var(--bg-elevated, #f8f9fa);
 }
 
 .booking-details-icon {
@@ -118,7 +118,7 @@
 
 .booking-details-label {
   font-size: 12px;
-  color: #95a5a6;
+  color: var(--text-muted, #95a5a6);
   font-weight: 600;
   margin-bottom: 4px;
   text-transform: uppercase;
@@ -127,7 +127,7 @@
 
 .booking-details-value {
   font-size: 15px;
-  color: #2c3e50;
+  color: var(--text-main, #2c3e50);
   font-weight: 600;
   word-wrap: break-word;
 }
@@ -176,21 +176,21 @@
 
 .booking-details-footer {
   padding: 16px 24px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--border-subtle, #e5e5e5);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  background: #f8f9fa;
+  background: var(--bg-elevated, #f8f9fa);
 }
 
 .booking-details-btn-secondary {
   padding: 10px 24px;
-  background: white;
-  border: 1.5px solid #e5e5e5;
+  background: var(--bg-surface, white);
+  border: 1.5px solid var(--border-subtle, #e5e5e5);
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-main, #333);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -198,5 +198,5 @@
 .booking-details-btn-secondary:hover {
   border-color: #2ecc71;
   color: #2ecc71;
-  background: #f0fdf4;
+  background: var(--accent-soft, #f0fdf4);
 }
