@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
@@ -18,10 +19,13 @@ export default function Login() {
 
     try {
       await login(email, password);
+      toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Login failed. Please check your credentials.';
-      setError(Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage);
+      const message = Array.isArray(errorMessage) ? errorMessage.join(', ') : errorMessage;
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

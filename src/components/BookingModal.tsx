@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { X, Calendar, Repeat, Dumbbell, Home } from 'lucide-react';
 import { apiService } from '../services/api';
 import type { Court, ApiBookingCategory, CreateBookingRequest, CreateFixedBookingRequest, Customer, Coach } from '../types';
@@ -38,7 +39,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
   
   // Fixed booking specific states
   const [endDate, setEndDate] = useState('');
-  const [repeatedDay, setRepeatedDay] = useState('Friday');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [notes, setNotes] = useState('');
   
@@ -52,6 +53,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       setCategories(categoriesData);
     } catch (err) {
       console.error('Failed to load categories:', err);
+      toast.error('Failed to load booking categories');
     }
   }, [clubId]);
 
@@ -61,6 +63,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       setCoaches(coachesData);
     } catch (err) {
       console.error('Failed to load coaches:', err);
+      toast.error('Failed to load coaches');
     }
   }, [clubId]);
 
@@ -111,8 +114,21 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       }
     } catch (err) {
       console.error('Failed to search customers:', err);
+      toast.error('Failed to search customers');
     }
   };
+
+  const toggleDay = (day: string) => {
+    setSelectedDays(prev => {
+      if (prev.includes(day)) {
+        return prev.filter(d => d !== day);
+      } else {
+        return [...prev, day];
+      }
+    });
+  };
+
+  const daysOfWeek = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
   if (!isOpen) return null;
 
@@ -161,10 +177,17 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
     }
 
     // Additional validation for fixed bookings
-    if (activeTab === 'fixed' && !endDate) {
-      setError('End date is required for fixed bookings');
-      setLoading(false);
-      return;
+    if (activeTab === 'fixed') {
+      if (!endDate) {
+        setError('End date is required for fixed bookings');
+        setLoading(false);
+        return;
+      }
+      if (selectedDays.length === 0) {
+        setError('Please select at least one day of the week');
+        setLoading(false);
+        return;
+      }
     }
 
     // Additional validation for coach bookings
@@ -211,20 +234,17 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
 
         await apiService.createBooking(clubId, bookingData);
       } else if (activeTab === 'fixed') {
-        // Fixed booking
+        // Fixed booking - now supports multiple days of the week
         const fixedBookingData: CreateFixedBookingRequest = {
           courtId: selectedCourt,
           bookingName: bookingName.trim(),
           phone: phoneNumber.trim(),
-          bookingType: bookingType === 'COACH' ? 'SINGLE' : bookingType,
-          startTime: startTime,
-          duration: parseInt(duration),
-          startDate: startingDate,
-          endDate: endDate,
-          repeatedDay: repeatedDay,
+          bookingType: "FIXED",
+          startDateTime: startDateTime.toISOString(),
+          durationMinutes: parseInt(duration),
+          repeatedDaysOfWeek: selectedDays.map(day => day.toUpperCase()),
+          recurrenceEndDate: endDate,
           price: parseFloat(bookingPrice),
-          paymentMethod: paymentMethod,
-          notes: notes,
         };
 
         if (selectedCustomerId) {
@@ -233,6 +253,10 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
 
         if (selectedCategory) {
           fixedBookingData.bookingCategoryId = selectedCategory;
+        }
+
+        if (notes) {
+          fixedBookingData.notes = notes;
         }
 
         await apiService.createFixedBooking(clubId, fixedBookingData);
@@ -278,11 +302,14 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
         onBookingCreated();
       }
 
+      toast.success('Booking created successfully!');
       onClose();
     } catch (err) {
       console.error('Failed to create booking:', err);
       const error = err as { response?: { data?: { message?: string } }; message?: string };
-      setError(error.response?.data?.message || error.message || 'Failed to create booking');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create booking';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -299,7 +326,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
     setSelectedCategory('');
     setSelectedCustomerId('');
     setEndDate('');
-    setRepeatedDay('Friday');
+    setSelectedDays([]);
     setPaymentMethod('Cash');
     setNotes('');
     setSelectedCoach('');
@@ -483,26 +510,8 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
 
           {/* Fixed Booking specific: Repeated Day and Court selection in second row */}
           {activeTab === 'fixed' && (
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="repeatedDay">Repeated Day *</label>
-                <select
-                  id="repeatedDay"
-                  value={repeatedDay}
-                  onChange={(e) => setRepeatedDay(e.target.value)}
-                  required
-                >
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
-                </select>
-              </div>
-
-              <div className="form-group">
+            <>
+              <div className="form-group full-width">
                 <label htmlFor="selectPitch">Select Court *</label>
                 <select
                   id="selectPitch"
@@ -518,6 +527,42 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
                   ))}
                 </select>
               </div>
+
+              <div className="form-group full-width">
+                <label>Repeated Days of Week *</label>
+                <div className="days-selector">
+                  {daysOfWeek.map((day) => (
+                    <button
+                      key={day}
+                      type="button"
+                      className={`day-button ${selectedDays.includes(day) ? 'selected' : ''}`}
+                      onClick={() => toggleDay(day)}
+                    >
+                      {day.substring(0, 3)}
+                    </button>
+                  ))}
+                </div>
+                {selectedDays.length > 0 && (
+                  <div className="selected-days-info">
+                    Selected: {selectedDays.join(', ')}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Show notes field for all tabs */}
+          {(activeTab === 'fixed' || activeTab === 'single' || activeTab === 'coach') && (
+            <div className="form-group full-width">
+              <label htmlFor="notes">Notes</label>
+              <textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add any additional notes..."
+                rows={3}
+                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #e5e5e5' }}
+              />
             </div>
           )}
 

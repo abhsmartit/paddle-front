@@ -1,3 +1,11 @@
+export const BookingType = {
+  SINGLE: 'SINGLE',
+  FIXED: 'FIXED',
+  COACH: 'COACH',
+} as const;
+
+export type BookingType = typeof BookingType[keyof typeof BookingType];
+
 export interface Court {
   id?: string;
   _id?: string;
@@ -23,7 +31,10 @@ export interface Booking {
   phone?: string;
   paymentStatus?: 'PENDING' | 'PARTIAL' | 'PAID';
   categoryName?: string;
-  bookingType?: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
+  bookingType?: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH' | 'FIXED';
+  bookingSource?: 'SCHEDULED' | 'ONLINE' | 'FIXED';
+  repeatedDaysOfWeek?: string[]; // For fixed bookings
+  recurrenceEndDate?: string; // For fixed bookings
 }
 
 export type ViewMode = 'day' | 'week' | 'month';
@@ -77,6 +88,9 @@ export interface ApiBooking {
   categoryColor?: string;
   paymentStatus: 'PENDING' | 'PARTIAL' | 'PAID';
   notes?: string;
+  repeatedDayOfWeek?: string; // Old format - single day
+  repeatedDaysOfWeek?: string[]; // New format - multiple days
+  recurrenceEndDate?: string; // For fixed bookings
   createdAt?: string;
   updatedAt?: string;
 }
@@ -111,14 +125,12 @@ export interface CreateFixedBookingRequest {
   customerId?: string;
   bookingName: string;
   phone: string;
-  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT';
-  startTime: string;
-  duration: number;
-  startDate: string;
-  endDate: string;
-  repeatedDay: string;
+  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH' | 'FIXED';
+  startDateTime: string; // ISO format
+  durationMinutes: number;
+  repeatedDaysOfWeek: string[]; // ['MONDAY', 'WEDNESDAY', 'FRIDAY']
+  recurrenceEndDate: string; // YYYY-MM-DD format
   price: number;
-  paymentMethod: string;
   bookingCategoryId?: string;
   notes?: string;
 }

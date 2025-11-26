@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -105,7 +106,10 @@ export default function Dashboard() {
             price: booking.price,
             paymentStatus: booking?.paymentStatus,
             categoryName: booking.categoryName,
-            bookingType: booking.bookingType
+            bookingType: booking.bookingType,
+            bookingSource: booking.bookingSource,
+            repeatedDaysOfWeek: booking.repeatedDaysOfWeek || (booking.repeatedDayOfWeek ? [booking.repeatedDayOfWeek] : undefined),
+            recurrenceEndDate: booking.recurrenceEndDate ? new Date(booking.recurrenceEndDate).toLocaleDateString('en-CA') : undefined
           };
         })
       );
@@ -123,7 +127,9 @@ export default function Dashboard() {
       setBookings(filteredBookings);
     } catch (error: any) {
       console.error('Failed to load data:', error);
-      setError(error.response?.data?.message || error.message || 'Failed to load data');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load data';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -233,7 +239,9 @@ export default function Dashboard() {
       }
     } catch (error: any) {
       console.error('Failed to drag-drop booking:', error);
-      setError(error.response?.data?.message || 'Failed to move booking');
+      const errorMessage = error.response?.data?.message || 'Failed to move booking';
+      setError(errorMessage);
+      toast.error(errorMessage);
       // Reload on error to revert changes
       await loadData();
     }
