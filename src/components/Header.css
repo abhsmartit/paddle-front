@@ -1,5 +1,5 @@
 .header {
-  height: 80px;
+  height: 72px;
   background: var(--bg-surface, #fff);
   border-bottom: 1px solid var(--border-subtle, #e5e5e5);
   display: flex;
