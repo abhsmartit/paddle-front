@@ -176,11 +176,11 @@ const ScheduleView = ({
       <div className="schedule-controls-header">
         {/* Previous / Next Buttons */}
         <div className="nav-group">
-          <button className="nav-btn" onClick={handlePrevious}>
+          <button className="schedule-nav-button" onClick={handlePrevious}>
             <ChevronLeft size={18} />
             <span>Previous</span>
           </button>
-          <button className="nav-btn" onClick={handleNext}>
+          <button className="schedule-nav-button" onClick={handleNext}>
             <span>Next</span>
             <ChevronRight size={18} />
           </button>
@@ -259,19 +259,19 @@ const ScheduleView = ({
         {/* View Mode Buttons */}
         <div className="view-toggle">
           <button
-            className={`toggle-btn ${viewMode === 'month' ? 'active' : ''}`}
+            className={`schedule-view-mode-button ${viewMode === 'month' ? 'active' : ''}`}
             onClick={() => onViewModeChange('month')}
           >
             Month
           </button>
           <button
-            className={`toggle-btn ${viewMode === 'week' ? 'active' : ''}`}
+            className={`schedule-view-mode-button ${viewMode === 'week' ? 'active' : ''}`}
             onClick={() => onViewModeChange('week')}
           >
             Week
           </button>
           <button
-            className={`toggle-btn ${viewMode === 'day' ? 'active' : ''}`}
+            className={`schedule-view-mode-button ${viewMode === 'day' ? 'active' : ''}`}
             onClick={() => onViewModeChange('day')}
           >
             Day

@@ -185,12 +185,12 @@ button:focus-visible {
 }
 
 [data-theme='dark'] .menu-item:hover {
-  background: #111827;
+  background: #0a0d15;
   color: var(--text-main);
 }
 
 [data-theme='dark'] .menu-item.active {
-  background: #1d4ed8;
+  background: #27ae60;;
   color: #e5e7eb;
 }
 
@@ -316,7 +316,7 @@ header {
 
 [data-theme='dark'] .schedule-view-mode-button.active {
   background: #111827;
-  color: #a5b4fc;
+  color: #e3e5f0;
 }
 
 /* ===============================

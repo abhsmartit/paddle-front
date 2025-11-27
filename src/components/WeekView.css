@@ -68,7 +68,7 @@
 }
 
 .schedule-date-display:hover {
-  border-color: var(--accent, #6366f1);
+  border-color: var(--accent, #0a0a11);
   background: var(--accent-soft, rgba(99, 102, 241, 0.04));
   color: var(--accent, #6366f1);
   transform: translateY(-1px);
@@ -100,16 +100,16 @@
 }
 
 .schedule-view-mode-button:hover {
-  border-color: #2ecc71;
+  border-color: #0b0c0c;
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
   transform: translateY(-1px);
-  color: #2ecc71;
+  color: #0b0d0c;
 }
 
 .schedule-view-mode-button.active {
   background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   color: #fff;
-  border-color: #27ae60;
+  border-color: #101913;
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
