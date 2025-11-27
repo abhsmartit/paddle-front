@@ -24,10 +24,10 @@
 
 .modal-content {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   width: 90%;
   max-width: 900px;
-  max-height: 90vh;
+  max-height: 95vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
@@ -44,13 +44,7 @@
   }
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 32px;
-  border-bottom: 1px solid #e2e8f0;
-}
+
 
 .modal-header h2 {
   margin: 0;
@@ -64,12 +58,14 @@
   border: none;
   cursor: pointer;
   color: #64748b;
-  transition: color 0.2s ease;
-  padding: 8px;
-  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 6px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .modal-close-button:hover {
@@ -79,26 +75,35 @@
 
 .modal-tabs {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid #e2e8f0;
-  padding: 0 32px;
+  padding: 8px 16px;
   gap: 8px;
   background: #f8fafc;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 4px;
+  flex: 1;
 }
 
 .modal-tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 16px 20px;
+  gap: 6px;
+  padding: 8px 12px;
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #64748b;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border-radius: 6px 6px 0 0;
 }
 
 .modal-tab:hover {
@@ -117,14 +122,14 @@
 }
 
 .modal-form {
-  padding: 32px;
+  padding: 16px 20px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .form-group {
@@ -141,9 +146,9 @@
 
 .form-group input,
 .form-group select {
-  padding: 12px 16px;
+  padding: 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   color: #0f172a;
   transition: all 0.2s ease;
@@ -223,9 +228,9 @@
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 32px;
-  padding-top: 24px;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid #e2e8f0;
 }
 
@@ -381,5 +386,161 @@
     min-width: 50px;
     padding: 8px 12px;
     font-size: 12px;
+  }
+}
+
+/* Close Stadium Tab Styles */
+.close-stadium-content {
+  padding: 16px;
+}
+
+.close-stadium-content h3 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-stadium-content h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.add-closed-date-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-add-closed-date {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.btn-add-closed-date:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a67d8 0%, #667eea 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-add-closed-date:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.existing-closed-dates-section {
+  margin-bottom: 24px;
+}
+
+.no-closed-dates {
+  padding: 32px;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #d1d5db;
+}
+
+.no-closed-dates p {
+  margin: 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.closed-dates-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+
+.closed-date-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.closed-date-item:last-child {
+  border-bottom: none;
+}
+
+.closed-date-item:hover {
+  background-color: #f9fafb;
+}
+
+.closed-date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.closed-date-date {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.closed-date-reason {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.btn-delete-closed-date {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.btn-delete-closed-date:hover:not(:disabled) {
+  background-color: #fee2e2;
+  transform: scale(1.1);
+}
+
+.btn-delete-closed-date:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .close-stadium-content {
+    padding: 16px;
+  }
+  
+  .add-closed-date-section {
+    padding: 16px;
+  }
+  
+  .closed-date-item {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .closed-date-info {
+    width: 100%;
+  }
+  
+  .btn-delete-closed-date {
+    align-self: flex-end;
   }
 }

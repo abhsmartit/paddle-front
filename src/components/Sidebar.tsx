@@ -10,6 +10,7 @@ import {
   TrendingUp,
   BarChart3,
   LogOut,
+  CalendarX,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -31,6 +32,7 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
     { id: 'schedule', label: t('schedule'), icon: Calendar, section: 'SCHEDULE' },
     { id: 'fixed-booking', label: t('fixedBooking'), icon: Repeat, section: 'SCHEDULE' },
     { id: 'booking-categories', label: t('bookingCategories'), icon: Grid3x3, section: 'SCHEDULE' },
+    { id: 'closed-dates', label: 'Closed Dates', icon: CalendarX, section: 'SCHEDULE' },
     { id: 'payment-methods', label: t('customPaymentMethods'), icon: CreditCard, section: 'SCHEDULE' },
     { id: 'waiting-list', label: t('waitingList'), icon: Users, section: 'SCHEDULE' },
   ];

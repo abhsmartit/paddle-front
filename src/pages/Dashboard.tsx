@@ -7,6 +7,7 @@ import ScheduleView from '../components/ScheduleView';
 import WeekView from '../components/WeekView';
 import MonthView from '../components/MonthView';
 import BookingModal from '../components/BookingModal';
+import ClosedDates from '../components/ClosedDates';
 import { apiService } from '../services/api';
 import type { ViewMode, Court, Booking, ApiCourt, ApiScheduleCourtBooking } from '../types';
 import '../App.css';
@@ -20,7 +21,6 @@ export default function Dashboard() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [courts, setCourts] = useState<Court[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Use ref to track if initial load is done
@@ -46,7 +46,6 @@ export default function Dashboard() {
   const loadData = useCallback(async () => {
     if (!clubId) return;
 
-    setLoading(true);
     setError(null);
     try {
       // Fetch courts
@@ -150,8 +149,6 @@ export default function Dashboard() {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to load data';
       setError(errorMessage);
       toast.error(errorMessage);
-    } finally {
-      setLoading(false);
     }
   }, [clubId, selectedDate]);
 
@@ -319,10 +316,15 @@ export default function Dashboard() {
   //   );
   // }
 
-  return (
-    <div className="app">
-      <Sidebar activeItem={activeMenuItem} onItemClick={handleMenuItemClick} />
-      <div className="main-content">
+  // Render different content based on active menu item
+  const renderMainContent = () => {
+    if (activeMenuItem === 'closed-dates') {
+      return <ClosedDates />;
+    }
+
+    // Default schedule view content
+    return (
+      <>
         <Header
           selectedCourt={courts.length > 0 ? `${courts.length} Courts Available` : 'No Courts'}
           onAddBooking={() => setIsBookingModalOpen(true)}
@@ -357,17 +359,26 @@ export default function Dashboard() {
             onViewModeChange={setViewMode}
           />
         )}
+        {isBookingModalOpen && clubId && (
+          <BookingModal
+            isOpen={isBookingModalOpen}
+            onClose={handleModalClose}
+            courts={courts}
+            selectedDate={selectedDate}
+            clubId={clubId}
+            onBookingCreated={loadData}
+          />
+        )}
+      </>
+    );
+  };
+
+  return (
+    <div className="app">
+      <Sidebar activeItem={activeMenuItem} onItemClick={handleMenuItemClick} />
+      <div className="main-content">
+        {renderMainContent()}
       </div>
-      {isBookingModalOpen && clubId && (
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={handleModalClose}
-          courts={courts}
-          selectedDate={selectedDate}
-          clubId={clubId}
-          onBookingCreated={loadData}
-        />
-      )}
     </div>
   );
 }

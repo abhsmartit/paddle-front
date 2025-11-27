@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { CreateClosedDateRequest } from '../types';
 
 const API_URL = 'http://localhost:3000';
 
@@ -131,7 +132,7 @@ export const apiService = {
     return response.data;
   },
 
-  createFixedBooking: async (clubId: string, data: CreateFixedBookingRequest) => {
+  createFixedBooking: async (clubId: string, data: any) => {
     const response = await api.post(`/clubs/${clubId}/bookings`, data);
     return response.data;
   },
@@ -226,6 +227,22 @@ export const apiService = {
 
   deleteBookingCategory: async (categoryId: string) => {
     const response = await api.delete(`/booking-categories/${categoryId}`);
+    return response.data;
+  },
+
+  // Closed Dates endpoints
+  getClosedDates: async (clubId: string) => {
+    const response = await api.get(`/clubs/${clubId}/closed-dates`);
+    return response.data;
+  },
+
+  createClosedDate: async (clubId: string, data: CreateClosedDateRequest) => {
+    const response = await api.post(`/clubs/${clubId}/closed-dates`, data);
+    return response.data;
+  },
+
+  deleteClosedDate: async (closedDateId: string) => {
+    const response = await api.delete(`/closed-dates/${closedDateId}`);
     return response.data;
   },
 };

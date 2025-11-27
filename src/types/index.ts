@@ -159,3 +159,17 @@ export interface Coach {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ClosedDate {
+  _id: string;
+  clubId: string;
+  closedDate: string; // YYYY-MM-DD format
+  reason: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateClosedDateRequest {
+  closedDate: string; // YYYY-MM-DD format
+  reason: string;
+}
