@@ -190,7 +190,7 @@ button:focus-visible {
 }
 
 [data-theme='dark'] .menu-item.active {
-  background: #27ae60;;
+  background: #151716;;
   color: #e5e7eb;
 }
 

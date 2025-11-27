@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 8px 14px;
+  padding: 8px 1px;
   background: #fff;
   border: 1.5px solid #e5e5e5;
   border-radius: 8px;
@@ -100,17 +100,17 @@
 }
 
 .schedule-view-mode-button:hover {
-  border-color: #2ecc71;
+  /* border-color: #2ecc71; */
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
   transform: translateY(-1px);
-  color: #2ecc71;
+  color: #818583;
 }
 
 .schedule-view-mode-button.active {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: #fff;
-  border-color: #27ae60;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  color: #0e0b0b;
+  /* border-color: #7f8481; */
+  /* box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3); */
 }
 
 .month-container {
@@ -126,7 +126,7 @@
 }
 
 .month-header {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #e9e9ef 0%, #f7f7fd 100%);
   padding: 20px 24px;
   text-align: center;
   flex-shrink: 0;
@@ -204,7 +204,7 @@
 
 .calendar-day.today {
   background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  border: 2px solid #2ecc71;
+  /* border: 2px solid #2ecc71; */
 }
 
 .calendar-day.selected {
@@ -220,7 +220,7 @@
 }
 
 .calendar-day.today .day-number {
-  background: #2ecc71;
+  /* background: #2ecc71; */
   color: white;
   width: 32px;
   height: 32px;
@@ -253,8 +253,8 @@
 
 .month-booking.green {
   background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(39, 174, 96, 0.2) 100%);
-  border-left: 3px solid #2ecc71;
-  color: #27ae60;
+  /* border-left: 3px solid #2ecc71; */
+  /* color: #27ae60; */
 }
 
 .month-booking.blue {
