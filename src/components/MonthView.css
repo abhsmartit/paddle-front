@@ -13,8 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  background: #ffffff;
+  padding: 25px 24px;
+  background: #fffdfe;
   border-bottom: 1px solid #e2e8f0;
   gap: 24px;
   flex-shrink: 0;
@@ -28,8 +28,8 @@
 .schedule-nav-button {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
+  gap: 2px;
+  padding: 8px 14px;
   background: #fff;
   border: 1.5px solid #e5e5e5;
   border-radius: 8px;

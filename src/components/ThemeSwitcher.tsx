@@ -23,7 +23,7 @@ const ThemeSwitcher = () => {
       onClick={toggleTheme}
       aria-label="Toggle theme"
     >
-      {theme === 'light' ? '🌞' : '🌙'}
+      {theme === 'light' ? '☀️' : '🌙'}
     </button>
   );
 };

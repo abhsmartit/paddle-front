@@ -97,7 +97,7 @@
   margin: 2px 10px;
   border-radius: 12px;
   cursor: pointer;
-  color: #4b5563;
+  color: #050506;
   font-size: 13px;
   line-height: 20px;
   transition:
@@ -124,7 +124,7 @@
 /* ACTIVE ITEM (BLUE PILL) */
 .menu-item.active {
   background: #e0edff;
-  color: #1d4ed8;
+  color: #22c55e;
 }
 
 /* LANGUAGE SWITCHER AREA */

@@ -73,19 +73,19 @@
 }
 
 .icon-button:hover {
-  background: #e8f5e9;
+  background: #82cc88;
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
   transform: translateY(-2px);
 }
 
 .add-button {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #27ae60 0%, #68a17f 100%);
+  color:#eff5f2;
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
 .add-button:hover {
-  color: #fff;
+  color:#27ae60;
   box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
   transform: translateY(-2px);
 }

@@ -126,11 +126,11 @@ const MonthView = ({ bookings, selectedDate, viewMode, onDateChange, onViewModeC
       </div>
 
       <div className="month-container">
-        <div className="month-header">
+        {/* <div className="month-header">
           <div className="month-title">
             {format(selectedDate, 'MMMM yyyy', { locale })}
           </div>
-        </div>
+        </div> */}
 
         <div className="month-calendar">
           {/* Weekday headers */}
