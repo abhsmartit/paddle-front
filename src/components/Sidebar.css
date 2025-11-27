@@ -138,21 +138,22 @@
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
 }
-
 .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: #e0edff;
+  background: #ffffff;        /* Light mode background */
+  color: #111827;
 }
 
+/* Avatar circle */
 .user-avatar {
   width: 30px;
   height: 30px;
   border-radius: 9999px;
-  background: #22c55e;
+  background: #8a8f8c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,37 +163,52 @@
   color: #ffffff;
 }
 
+/* Text block */
 .user-details {
+  display: flex;
+  flex-direction: column;
   flex: 1;
 }
 
+/* "System Admin" */
+/* Make sure the name is always visible */
 .user-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827 !important;  /* force dark text */
+  opacity: 1 !important;      /* remove any dimming */
 }
 
+
+/* "admin@padelclub.com" */
 .user-email {
-  font-size: 11px;
-  color: #6b7280;
+  font-size: 13px;
+  color: #090d13;             /* softer gray but still visible */
 }
 
-.logout-icon {
+/* Logout button on right */
+.user-logout-btn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  color: #6b7280;
-  transition: color 0.15s ease;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logout-icon:hover {
-  color: #111827;
+/* Text colors in dark mode */
+.dark .user-name {
+  color: #ffffff;
 }
 
-/* THIN SCROLLBAR */
-.sidebar-content::-webkit-scrollbar {
-  width: 4px;
+.dark .user-email {
+  color: #d1d5db;             /* light gray */
 }
 
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 9999px;
+/* Logout icon stroke fix for dark mode */
+.dark .logout-icon {
+  stroke: #d1d5db;
 }

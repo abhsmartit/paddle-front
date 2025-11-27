@@ -104,21 +104,24 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
         </div>
       </div>
 
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <div className="user-avatar">{user?.fullName?.charAt(0).toUpperCase() || 'A'}</div>
-          <div className="user-details">
-            <div className="user-name">{user?.fullName || 'Admin'}</div>
-            <div className="user-email">{user?.email || 'admin@padelclub.com'}</div>
-          </div>
-          <LogOut
-            size={18}
-            className="logout-icon"
-            onClick={() => onItemClick('logout')}
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-      </div>
+    <div className="sidebar-footer">
+  <div className="user-info">
+    <div className="user-avatar">
+      {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+    </div>
+    <div className="user-details">
+      <div className="user-name">{user?.fullName || 'Admin'}</div>
+      <div className="user-email">{user?.email || 'admin@padelclub.com'}</div>
+    </div>
+    <LogOut
+      size={18}
+      className="logout-icon"
+      onClick={() => onItemClick('logout')}
+      style={{ cursor: 'pointer' }}
+    />
+  </div>
+</div>
+
     </div>
   );
 };

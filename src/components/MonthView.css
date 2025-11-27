@@ -28,8 +28,8 @@
 .schedule-nav-button {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 8px 1px;
+  gap: 10px;
+  padding: 8px 10px;
   background: #fff;
   border: 1.5px solid #e5e5e5;
   border-radius: 8px;
@@ -41,13 +41,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.schedule-nav-button:hover {
-  border-color: #6366f1;
+/* .schedule-nav-button:hover {
+  border-color: #08080a;
   background: rgba(99, 102, 241, 0.04);
-  color: #6366f1;
+  color: #857d7d;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
-}
+} */
 
 .schedule-date-display {
   display: flex;
@@ -68,9 +68,9 @@
 }
 
 .schedule-date-display:hover {
-  border-color: #6366f1;
+  /* border-color: #6366f1; */
   background: rgba(99, 102, 241, 0.04);
-  color: #6366f1;
+  /* color: #6366f1; */
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
 }
