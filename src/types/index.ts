@@ -6,6 +6,12 @@ export const BookingType = {
 
 export type BookingType = typeof BookingType[keyof typeof BookingType];
 
+export interface ClosedDate {
+  closedDateId: string;
+  closedDate: string; // ISO date string
+  reason: string;
+}
+
 export interface Court {
   id?: string;
   _id?: string;
@@ -14,6 +20,7 @@ export interface Court {
   courtType?: string;
   defaultPricePerHour?: number;
   isActive?: boolean;
+  closedDates?: ClosedDate[];
 }
 
 export interface Booking {
@@ -99,6 +106,7 @@ export interface ApiScheduleCourtBooking {
   courtId: string;
   courtName: string;
   bookings: ApiBooking[];
+  closedDates?: ClosedDate[];
 }
 
 export interface ApiDaySchedule {

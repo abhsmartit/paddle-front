@@ -174,6 +174,18 @@
   background: transparent;   /* color is on the card itself */
 }
 
+.court-cell-half.closed {
+  background: repeating-linear-gradient(
+    45deg,
+    #fee2e2,
+    #fee2e2 10px,
+    #fecaca 10px,
+    #fecaca 20px
+  );
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* --- Booking Card (Ahmed Samir style) --- */
 .booking-card {
   width: calc(100% - 6px);

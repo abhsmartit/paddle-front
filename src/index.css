@@ -1,4 +1,11 @@
 /* ===============================
+   TAILWIND DIRECTIVES
+   =============================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
    GLOBAL BASE + LIGHT THEME
    =============================== */
 

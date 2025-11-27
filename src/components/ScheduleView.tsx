@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState } from 'react';
 import {
   format,
   addMonths,
@@ -17,6 +17,11 @@ import BookingCard from './BookingCard';
 import BookingDetailsModal from './BookingDetailsModal';
 import './ScheduleView.css';
 
+// Utility function for conditional classNames
+const cn = (...classes: (string | undefined | false)[]): string => {
+  return classes.filter(Boolean).join(' ');
+};
+
 interface ScheduleViewProps {
   courts: Court[];
   bookings: Booking[];
@@ -25,6 +30,22 @@ interface ScheduleViewProps {
   onDateChange: (date: Date) => void;
   onViewModeChange: (mode: ViewMode) => void;
   onBookingDragDrop?: (bookingId: string, newCourtId: string, newStartTime: string, newEndTime: string, date: string) => Promise<void>;
+  onEventClick?: (event: any) => void;
+}
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  color: 'green' | 'blue' | 'red' | 'yellow' | 'purple' | 'orange' | 'pink' | 'teal';
+  metadata?: {
+    courtId: string;
+    status?: string;
+    bookingType?: string;
+    phone?: string;
+    price?: number;
+  };
 }
 
 const ScheduleView = ({
@@ -54,8 +75,39 @@ const ScheduleView = ({
     onDateChange(newDate);
   };
 
-  const handleDragStart = (booking: Booking) => {
-    setDraggedBooking(booking);
+  const handleDragStart = (booking: Booking | CalendarEvent) => {
+    if ('playerName' in booking) {
+      // It's a Booking
+      setDraggedBooking(booking);
+    } else {
+      // It's a CalendarEvent - convert to booking for compatibility
+      const convertedBooking: Booking = {
+        id: booking.id,
+        courtId: booking.metadata?.courtId || '',
+        playerName: booking.title,
+        phone: booking.metadata?.phone || '',
+        startTime: format(new Date(booking.startDate), 'HH:mm'),
+        endTime: format(new Date(booking.endDate), 'HH:mm'),
+        date: format(new Date(booking.startDate), 'yyyy-MM-dd'),
+        color: booking.color as 'green' | 'blue',
+        status: booking.metadata?.status || 'pending',
+        price: booking.metadata?.price || 0,
+        paymentStatus: (booking.metadata?.status as 'PENDING' | 'PARTIAL' | 'PAID') || 'PENDING',
+        bookingType: 'SINGLE',
+        bookingSource: 'ONLINE',
+        isOvernightBooking: false
+      };
+      setDraggedBooking(convertedBooking);
+    }
+  };
+
+  const handleSlotClick = (courtId: string, slotIndex: number) => {
+    // Handle slot click - could open booking modal
+    console.log('Slot clicked:', courtId, slotIndex);
+  };
+
+  const handleDropEvent = (courtId: string, slotIndex: number) => {
+    handleDrop(courtId, slotIndex);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -132,6 +184,22 @@ const ScheduleView = ({
     const endsToday = booking.isOvernightBooking && booking.endDate === currentDateStr;
     return startsToday || endsToday;
   });
+
+  // Convert bookings to events format for new grid
+  const dayEvents: CalendarEvent[] = dayBookings.map(booking => ({
+    id: booking.id,
+    title: booking.playerName,
+    startDate: `${booking.date}T${booking.startTime}:00`,
+    endDate: `${booking.endDate || booking.date}T${booking.endTime}:00`,
+    color: (booking.color === 'green' || booking.color === 'blue') ? booking.color : 'green',
+    metadata: {
+      courtId: booking.courtId,
+      status: booking.status,
+      bookingType: booking.bookingType,
+      phone: booking.phone,
+      price: booking.price
+    }
+  }));
 
   const timeSlots = Array.from({ length: 48 }, (_, i) => {
     const hour = Math.floor(i / 2);
@@ -281,75 +349,114 @@ const ScheduleView = ({
 
       {/* --- Schedule Grid --- */}
       <div className="schedule-container">
-        <div className="schedule-header">
-          <div className="time-column-header"></div>
+        {/* Court Headers */}
+        <div className="grid" style={{gridTemplateColumns: `80px repeat(${courts.length}, 1fr)`}}>
+          <div className="p-2 text-xs text-gray-600 dark:text-gray-400 text-right border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"></div>
           {courts.map((court) => (
-            <div key={court.id || court._id} className="court-header">
-              <div className="court-name">{court.name}</div>
-              <div className="court-capacity">({court.capacity})</div>
+            <div key={court.id || court._id} className="p-2 text-center border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 last:border-r-0">
+              <div className="font-medium text-sm text-gray-900 dark:text-gray-100">{court.name}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">({court.capacity})</div>
             </div>
           ))}
         </div>
 
-        <div className="schedule-grid">
+        {/* Time Slots Grid */}
+        <div className="flex-1 overflow-y-auto">
           {timeSlots.map((time, slotIndex) => (
-            <Fragment key={time}>
-              <div className="time-slot">{time}</div>
-              {courts.map((court) => {
+            <div key={time} className="grid gap-0 border-b border-gray-100 dark:border-gray-800" style={{gridTemplateColumns: `80px repeat(${courts.length}, 1fr)`}}>
+              {/* Time label */}
+              <div className="p-2 text-xs text-gray-600 dark:text-gray-400 text-right border-r border-gray-200 dark:border-gray-700 flex items-center justify-end min-h-[32px] bg-gray-50 dark:bg-gray-800">
+                {time}
+              </div>
+              
+              {/* Court cells for this time slot */}
+              {courts.map((court, courtIndex) => {
                 const courtId = court.id || court._id || '';
 
-                const slotBooking = dayBookings.find((booking) => {
-                  // For overnight bookings ending today, they start at slot 0
-                  if (booking.isOvernightBooking && booking.endDate === currentDateStr) {
-                    const e = getSlotIndex(booking.endTime);
-                    return (
-                      booking.courtId === courtId &&
-                      slotIndex >= 0 &&
-                      slotIndex < e
-                    );
-                  }
+                const slotEvent = dayEvents.find((event) => {
+                  const eventStartTime = format(new Date(event.startDate), 'HH:mm');
+                  const eventEndTime = format(new Date(event.endDate), 'HH:mm');
+                  const s = getSlotIndex(eventStartTime);
+                  let e = getSlotIndex(eventEndTime);
                   
-                  // For regular bookings or bookings starting today
-                  const s = getSlotIndex(booking.startTime);
-                  let e = getSlotIndex(booking.endTime);
-                  
-                  if (e <= s) e += 48; // Overnight booking
+                  if (e <= s) e += 48; // Handle overnight bookings
                   
                   return (
-                    booking.courtId === courtId &&
+                    event.metadata?.courtId === courtId &&
                     slotIndex >= s &&
-                    slotIndex <= e
+                    slotIndex < e
                   );
                 });
-                console.log(slotBooking ,"slotBooking");
-                
 
-                const isStart =
-                  slotBooking &&
-                  ((slotBooking.isOvernightBooking && slotBooking.endDate === currentDateStr && slotIndex === 0) ||
-                   (getSlotIndex(slotBooking.startTime) === slotIndex));
+                const isEventStart = slotEvent && getSlotIndex(format(new Date(slotEvent.startDate), 'HH:mm')) === slotIndex;
 
                 return (
                   <div
                     key={`${courtId}-${slotIndex}`}
-                    className={`court-cell-half ${
-                      slotBooking ? 'has-booking' : ''
-                    } ${slotBooking?.color || ''}`}
+                    className={cn(
+                      'relative border-r border-gray-200 dark:border-gray-700 min-h-[32px] cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
+                      courtIndex === courts.length - 1 && 'border-r-0',
+                      slotEvent && slotEvent.color === 'green' && 'bg-green-100 dark:bg-green-900/20',
+                      slotEvent && slotEvent.color === 'blue' && 'bg-blue-100 dark:bg-blue-900/20',
+                      slotEvent && slotEvent.color === 'red' && 'bg-red-100 dark:bg-red-900/20',
+                      slotEvent && slotEvent.color === 'yellow' && 'bg-yellow-100 dark:bg-yellow-900/20',
+                      slotEvent && slotEvent.color === 'purple' && 'bg-purple-100 dark:bg-purple-900/20',
+                      slotEvent && slotEvent.color === 'orange' && 'bg-orange-100 dark:bg-orange-900/20',
+                      slotEvent && slotEvent.color === 'pink' && 'bg-pink-100 dark:bg-pink-900/20',
+                      slotEvent && slotEvent.color === 'teal' && 'bg-teal-100 dark:bg-teal-900/20'
+                    )}
                     onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(courtId, slotIndex)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      handleDropEvent(courtId, slotIndex);
+                    }}
+                    onClick={() => handleSlotClick(courtId, slotIndex)}
                   >
-                    {isStart && slotBooking && (
-                      <BookingCard
-                        booking={slotBooking}
-                        duration={getDisplayDuration(slotBooking)}
-                        onDragStart={() => handleDragStart(slotBooking)}
-                        onViewDetails={handleViewDetails}
-                      />
+                    {isEventStart && slotEvent && (
+                      <div
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move';
+                          handleDragStart(slotEvent);
+                        }}
+                        className={cn(
+                          'absolute inset-x-0 rounded px-2 py-1 text-xs cursor-move shadow-sm border-l-2 overflow-hidden',
+                          slotEvent.color === 'green' && 'bg-green-500 text-white border-green-600',
+                          slotEvent.color === 'blue' && 'bg-blue-500 text-white border-blue-600',
+                          slotEvent.color === 'red' && 'bg-red-500 text-white border-red-600',
+                          slotEvent.color === 'yellow' && 'bg-yellow-500 text-black border-yellow-600',
+                          slotEvent.color === 'purple' && 'bg-purple-500 text-white border-purple-600',
+                          slotEvent.color === 'orange' && 'bg-orange-500 text-white border-orange-600',
+                          slotEvent.color === 'pink' && 'bg-pink-500 text-white border-pink-600',
+                          slotEvent.color === 'teal' && 'bg-teal-500 text-white border-teal-600'
+                        )}
+                        style={{ 
+                          height: `${getDuration(
+                            format(new Date(slotEvent.startDate), 'HH:mm'),
+                            format(new Date(slotEvent.endDate), 'HH:mm')
+                          ) * 42}px`,
+                          zIndex: 10,
+                          marginTop: '2px'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Convert event back to booking for details modal
+                          const booking = dayBookings.find(b => b.id === slotEvent.id);
+                          if (booking) {
+                            handleViewDetails(booking);
+                          }
+                        }}
+                      >
+                        <div className="font-medium truncate text-xs leading-tight">{slotEvent.title}</div>
+                        <div className="text-xs opacity-75 truncate leading-tight">
+                          {format(new Date(slotEvent.startDate), 'HH:mm')} - {format(new Date(slotEvent.endDate), 'HH:mm')}
+                        </div>
+                      </div>
                     )}
                   </div>
                 );
               })}
-            </Fragment>
+            </div>
           ))}
         </div>
       </div>

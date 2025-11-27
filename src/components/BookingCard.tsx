@@ -28,7 +28,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onViewDetails,
 }) => {
   // 40px per half hour slot - card should fill the full space
-  const heightPerHalfHour = 50;
+  console.log(duration ,"from BookingCard");
+  
+  const heightPerHalfHour = duration === 120 ? 50 : 40;
   const cardHeight = duration * heightPerHalfHour;
 
   // ✅ safely handle missing price, default to 300

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { format, startOfWeek, addDays } from 'date-fns';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { enUS, ar } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import type { Booking, Court, ViewMode } from '../types';
+import { CalendarPicker } from './ui/CalendarPicker';
 import './WeekView.css';
 
 interface WeekViewProps {
@@ -72,50 +73,58 @@ const createSegments = (booking: Booking): BookingSegment[] => {
   return [{ booking, dayStr: baseDayStr }];
 };
 
-const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onViewModeChange }: WeekViewProps) => {
+/**
+ * WeekView - Optimized week view with CalendarPicker integration
+ * 
+ * Changes:
+ * - Replaced date navigation with CalendarPicker
+ * - Added React.memo for component-level optimization
+ * - Used useCallback for all event handlers
+ * - Used useMemo for expensive calculations (segments, week days)
+ * - Preserved all existing overnight booking logic
+ * 
+ * API compatibility: All props remain unchanged
+ */
+const WeekView = React.memo<WeekViewProps>(({ courts, bookings, selectedDate, viewMode, onDateChange, onViewModeChange }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === 'ar' ? ar : enUS;
+  
+  // Memoized locale
+  const locale = useMemo(() => i18n.language === 'ar' ? ar : enUS, [i18n.language]);
 
-  const handlePrevious = () => {
+  // Memoized week days
+  const weekDays = useMemo(() => {
+    const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  }, [selectedDate]);
+
+  // Memoized booking segments
+  const allSegments = useMemo(() => {
+    return bookings.flatMap(createSegments);
+  }, [bookings]);
+
+  // Navigation handlers
+  const handlePrevious = useCallback(() => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 7); // Go back one week
+    newDate.setDate(newDate.getDate() - 7);
     onDateChange(newDate);
-  };
+  }, [selectedDate, onDateChange]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 7); // Go forward one week
+    newDate.setDate(newDate.getDate() + 7);
     onDateChange(newDate);
-  };
+  }, [selectedDate, onDateChange]);
 
-  // Week days (Sun..Sat)
-  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
-  const weekDays = Array.from({ length: 7 }, (_, i) =>
-    addDays(weekStart, i),
+  // Get segments for a specific day and court (memoized per render)
+  const getSegmentsForDayAndCourt = useCallback(
+    (date: Date, courtId: string): BookingSegment[] => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      return allSegments
+        .filter((seg) => seg.dayStr === dateStr && seg.booking.courtId === courtId)
+        .sort((a, b) => getSlotIndex(a.booking.startTime) - getSlotIndex(b.booking.startTime));
+    },
+    [allSegments]
   );
-
-  // Create all segments once from raw bookings
-  const allSegments: BookingSegment[] = bookings.flatMap(createSegments);
-
-  // All segments for a given (day, court) cell
-  const getSegmentsForDayAndCourt = (
-    date: Date,
-    courtId: string,
-  ): BookingSegment[] => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-
-    return allSegments
-      .filter(
-        (seg) =>
-          seg.dayStr === dateStr &&
-          seg.booking.courtId === courtId,
-      )
-      .sort(
-        (a, b) =>
-          getSlotIndex(a.booking.startTime) -
-          getSlotIndex(b.booking.startTime),
-      );
-  };
 
   return (
     <div className="week-view">
@@ -131,10 +140,13 @@ const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onVi
           </button>
         </div>
 
-        <div className="schedule-date-display">
-          <span>{format(selectedDate, 'EEEE MMM dd', { locale })}</span>
-          <ChevronDown size={18} />
-        </div>
+        <CalendarPicker
+          value={selectedDate}
+          onChange={onDateChange}
+          displayFormat="'Week of' MMM dd, yyyy"
+          variant="outline"
+          className="min-w-[200px]"
+        />
 
         <div className="schedule-view-mode-selector">
           <button
@@ -240,6 +252,8 @@ const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onVi
       </div>
     </div>
   );
-};
+});
 
-export default React.memo(WeekView);
+WeekView.displayName = 'WeekView';
+
+export default WeekView;

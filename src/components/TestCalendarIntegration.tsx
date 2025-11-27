@@ -1,18 +1,21 @@
+/**
+ * Test Calendar Integration Component
+ * 
+ * Full calendar integration using real API data from the Padel booking system
+ */
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import ScheduleView from '../components/ScheduleView';
-import WeekView from '../components/WeekView';
-import MonthView from '../components/MonthView';
-import BookingModal from '../components/BookingModal';
-import { apiService } from '../services/api';
-import type { ViewMode, Court, Booking, ApiCourt, ApiScheduleCourtBooking } from '../types';
-import '../App.css';
 import { format } from 'date-fns';
+import { useAuth } from '../contexts/AuthContext';
+import { apiService } from '../services/api';
+import { Calendar } from '../modules/components/calendar/Calendar';
+import { CalendarHeader } from '../modules/components/calendar/CalendarHeader';
+import { CalendarBody } from '../modules/components/calendar/CalendarBody';
+import type { ViewMode, Court, Booking, ApiCourt, ApiScheduleCourtBooking } from '../types';
+import type { IEvent } from '../modules/calendar/interfaces';
 
-export default function Dashboard() {
+export function TestCalendarIntegration() {
   const { clubId, logout } = useAuth();
   const [activeMenuItem, setActiveMenuItem] = useState('schedule');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -163,7 +166,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [clubId, selectedDate]);
+  }, [clubId, selectedDate, viewMode]);
 
   const handleMenuItemClick = useCallback(async (item: string) => {
     if (item === 'logout') {
@@ -282,102 +285,121 @@ export default function Dashboard() {
     loadData();
   }, [loadData]);
 
+  const handleEventDrop = (event: IEvent, newStartDate: Date, newEndDate: Date, newCourtId?: string) => {
+    console.log('Event dropped:', event, 'New time:', newStartDate, '->', newEndDate, 'New court:', newCourtId);
+    
+    // Convert the event drop to the format expected by handleBookingDragDrop
+    if (event.metadata?.bookingId && event.metadata?.courtId) {
+      const dateStr = format(newStartDate, 'yyyy-MM-dd');
+      const startTime = format(newStartDate, 'HH:mm');
+      const endTime = format(newEndDate, 'HH:mm');
+      const courtId = newCourtId || event.metadata.courtId; // Use new court if provided, otherwise keep original
+      
+      // Show immediate feedback
+      const courtName = courts.find(c => c.id && c.id.toString() === courtId)?.name || `Court ${courtId}`;
+      const timeRange = `${startTime} - ${endTime}`;
+      const moveId = `move-${event.metadata.bookingId}`;
+      
+      toast.loading(`Moving booking to ${courtName} at ${timeRange}...`, {
+        id: moveId,
+        duration: 2000
+      });
+      
+      handleBookingDragDrop(event.metadata.bookingId, courtId, startTime, endTime, dateStr)
+        .then(() => {
+          toast.success(`Booking moved to ${courtName} at ${timeRange}`, {
+            id: moveId,
+            duration: 3000
+          });
+        })
+        .catch((error) => {
+          toast.error(`Failed to move booking: ${error.message}`, {
+            id: moveId,
+            duration: 4000
+          });
+        });
+    }
+  };
 
+  // Make handleEventDrop available globally for CalendarDayView
+  useEffect(() => {
+    (window as any).handleEventDrop = handleEventDrop;
+    return () => {
+      delete (window as any).handleEventDrop;
+    };
+  }, [handleEventDrop]);
 
   if (error) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        fontSize: '18px',
-        color: '#ef4444',
-        gap: '16px'
-      }}>
-        <div>Error: {error}</div>
-        <button 
-          onClick={loadData}
-          style={{
-            padding: '8px 16px',
-            background: '#667eea',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
-        >
-          Retry
-        </button>
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+          <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+            Error Loading Calendar Data
+          </h2>
+          <p className="text-red-600 dark:text-red-300 mb-4">{error}</p>
+          <button 
+            onClick={loadData}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
 
-  // if (!clubId) {
-  //   return (
-  //     <div style={{
-  //       display: 'flex',
-  //       alignItems: 'center',
-  //       justifyContent: 'center',
-  //       minHeight: '100vh',
-  //       fontSize: '18px',
-  //       color: '#ef4444'
-  //     }}>
-  //       No club selected. Please login again.
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+            <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          </div>
+          <p className="text-center text-gray-600 dark:text-gray-400 mt-4">
+            Loading calendar data...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="app">
-      <Sidebar activeItem={activeMenuItem} onItemClick={handleMenuItemClick} />
-      <div className="main-content">
-        <Header
-          selectedCourt={courts.length > 0 ? `${courts.length} Courts Available` : 'No Courts'}
-          onAddBooking={() => setIsBookingModalOpen(true)}
-        />
-        {viewMode === 'day' && (
-          <ScheduleView 
-            courts={courts} 
-            bookings={bookings} 
-            selectedDate={selectedDate}
-            viewMode={viewMode}
-            onDateChange={setSelectedDate}
-            onViewModeChange={setViewMode}
-            onBookingDragDrop={handleBookingDragDrop}
-          />
-        )}
-        {viewMode === 'week' && (
-          <WeekView 
-            courts={courts} 
-            bookings={bookings} 
-            selectedDate={selectedDate}
-            viewMode={viewMode}
-            onDateChange={setSelectedDate}
-            onViewModeChange={setViewMode}
-          />
-        )}
-        {viewMode === 'month' && (
-          <MonthView 
-            bookings={bookings} 
-            selectedDate={selectedDate}
-            viewMode={viewMode}
-            onDateChange={setSelectedDate}
-            onViewModeChange={setViewMode}
-          />
-        )}
-      </div>
-      {isBookingModalOpen && clubId && (
-        <BookingModal
-          isOpen={isBookingModalOpen}
-          onClose={handleModalClose}
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+        Full Calendar Integration Test
+      </h1>
+      
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden h-[700px] flex flex-col">
+        <Calendar
+          bookings={bookings}
           courts={courts}
-          selectedDate={selectedDate}
-          clubId={clubId}
-          onBookingCreated={loadData}
-        />
-      )}
+          customers={[]} // We don't have separate customer data in this API format
+          coaches={[]}   // We don't have separate coach data in this API format
+          onEventDrop={handleEventDrop}
+          className="h-full flex flex-col"
+        >
+          <div className="h-full flex flex-col">
+            <CalendarHeader />
+            <CalendarBody />
+          </div>
+        </Calendar>
+      </div>
+      
+      <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+        <h3 className="font-semibold mb-2 text-gray-900 dark:text-white">Court-Based Calendar Features:</h3>
+        <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+          <li>• Real Padel booking API integration</li>
+          <li>• Court-column layout (like image provided)</li>
+          <li>• Current date: {format(selectedDate, 'yyyy-MM-dd')}</li>
+          <li>• View mode: {viewMode}</li>
+          <li>• Courts loaded: {courts.length}</li>
+          <li>• Bookings loaded: {bookings.length}</li>
+          <li>• Drag-drop between courts and time slots</li>
+          <li>• Multiple calendar views (Day/Week/Month/Year/Agenda)</li>
+          <li>• Click events to view details, click slots to create bookings</li>
+        </ul>
+      </div>
     </div>
   );
 }

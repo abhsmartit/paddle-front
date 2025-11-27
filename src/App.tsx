@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import { TestCalendarIntegration } from './components/TestCalendarIntegration';
 import { useAuth } from './contexts/AuthContext';
 import './App.css';
 
@@ -61,6 +62,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendar-test"
+          element={
+            <ProtectedRoute>
+              <TestCalendarIntegration />
             </ProtectedRoute>
           }
         />
