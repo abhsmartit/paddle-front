@@ -202,6 +202,19 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
     }
   };
 
+  // Helper function to check if a date is closed
+  const isDateClosed = (dateString: string) => {
+    if (!dateString) return false;
+    return closedDates.some(closedDate => 
+      closedDate.closedDate === dateString
+    );
+  };
+
+  // Helper function to format date for comparison (YYYY-MM-DD)
+  const formatDateForComparison = (date: Date) => {
+    return date.toISOString().split('T')[0];
+  };
+
   if (!isOpen) return null;
 
   const tabs = [
@@ -254,6 +267,13 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       return;
     }
 
+    // Check if booking date is closed
+    if (isDateClosed(startingDate)) {
+      setError('Cannot book on a closed date. Please select a different date.');
+      setLoading(false);
+      return;
+    }
+
     // Additional validation for fixed bookings
     if (activeTab === 'fixed') {
       if (!endDate) {
@@ -263,6 +283,12 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
       }
       if (selectedDays.length === 0) {
         setError('Please select at least one day of the week');
+        setLoading(false);
+        return;
+      }
+      // Check if end date is closed for fixed bookings
+      if (isDateClosed(endDate)) {
+        setError('Cannot set end date on a closed date. Please select a different end date.');
         setLoading(false);
         return;
       }
@@ -643,9 +669,24 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
                   type="date"
                   id="startingDate"
                   value={startingDate}
-                  onChange={(e) => setStartingDate(e.target.value)}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value;
+                    if (isDateClosed(selectedDate)) {
+                      setError('This date is closed. Please select a different date.');
+                    } else {
+                      setError(null);
+                    }
+                    setStartingDate(selectedDate);
+                  }}
+                  min={formatDateForComparison(new Date())}
+                  className={isDateClosed(startingDate) ? 'date-closed' : ''}
                   required
                 />
+                {isDateClosed(startingDate) && (
+                  <small className="date-closed-warning">
+                    ⚠️ This date is closed: {closedDates.find(cd => cd.closedDate === startingDate)?.reason}
+                  </small>
+                )}
               </div>
 
               {/* Fixed Booking specific: End Date */}
@@ -656,9 +697,24 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
                     type="date"
                     id="endDate"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => {
+                      const selectedEndDate = e.target.value;
+                      if (isDateClosed(selectedEndDate)) {
+                        setError('This end date is closed. Please select a different date.');
+                      } else {
+                        setError(null);
+                      }
+                      setEndDate(selectedEndDate);
+                    }}
+                    min={startingDate || formatDateForComparison(new Date())}
+                    className={isDateClosed(endDate) ? 'date-closed' : ''}
                     required
                   />
+                  {isDateClosed(endDate) && (
+                    <small className="date-closed-warning">
+                      ⚠️ This date is closed: {closedDates.find(cd => cd.closedDate === endDate)?.reason}
+                    </small>
+                  )}
                 </div>
               ) : (
                 <div className="form-group">

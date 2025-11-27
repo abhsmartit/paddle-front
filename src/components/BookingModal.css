@@ -544,3 +544,34 @@
     align-self: flex-end;
   }
 }
+
+/* Closed Date Validation Styles */
+.date-closed {
+  border-color: #dc3545 !important;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.date-closed:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+.date-closed-warning {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
+}
+
+/* Dark mode support for closed date validation */
+[data-theme='dark'] .date-closed {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: #dc3545 !important;
+  color: #f8d7da;
+}
+
+[data-theme='dark'] .date-closed-warning {
+  color: #f8d7da;
+}
