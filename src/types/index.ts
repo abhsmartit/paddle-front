@@ -25,7 +25,7 @@ export interface Booking {
   date: string; // Format: YYYY-MM-DD (start date)
   endDate?: string; // Format: YYYY-MM-DD (end date if overnight booking)
   isOvernightBooking?: boolean; // True if booking spans midnight
-  color: 'green' | 'blue';
+  color: 'green' | 'blue' | 'orange';
   status?: string;
   price?: number;
   phone?: string;
@@ -78,7 +78,7 @@ export interface ApiBooking {
   coachId?: string;
   bookingName: string;
   phone: string;
-  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
+  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH' | 'FIXED';
   bookingSource: 'SCHEDULED' | 'ONLINE' | 'FIXED';
   startDateTime: string;
   endDateTime: string;
@@ -112,7 +112,7 @@ export interface CreateBookingRequest {
   coachId?: string;
   bookingName: string;
   phone: string;
-  bookingType: 'SINGLE' | 'TEAM' | 'TOURNAMENT' | 'COACH';
+  bookingType: 'SINGLE' | 'COACH' | "FIXED";
   startDateTime: string;
   endDateTime: string;
   price: number;

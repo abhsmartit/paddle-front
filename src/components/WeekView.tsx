@@ -85,14 +85,12 @@ const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onVi
   const locale = i18n.language === 'ar' ? ar : enUS;
 
   const handlePrevious = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 7); // Go back one week
+    const newDate = addDays(selectedDate, -7);
     onDateChange(newDate);
   };
 
   const handleNext = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 7); // Go forward one week
+    const newDate = addDays(selectedDate, 7);
     onDateChange(newDate);
   };
 

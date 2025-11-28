@@ -337,6 +337,8 @@ const ScheduleView = ({
                         
                         if (e <= s) e += 48;
                         
+                        // Use < e instead of <= e because end time slot is exclusive
+                        // e.g., 13:00-14:30 = slots 26,27,28 (not 29)
                         return (
                           booking.courtId === courtId &&
                           slotIndex >= s &&

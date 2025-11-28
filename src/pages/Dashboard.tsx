@@ -11,7 +11,7 @@ import ClosedDates from '../components/ClosedDates';
 import { apiService } from '../services/api';
 import type { ViewMode, Court, Booking, ApiCourt, ApiScheduleCourtBooking } from '../types';
 
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
   const { clubId, logout } = useAuth();
@@ -19,7 +19,8 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
   const [courts, setCourts] = useState<Court[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +72,9 @@ export default function Dashboard() {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         scheduleResponse = await apiService.getDaySchedule(clubId, dateStr);
       } else if (viewMode === 'week') {
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
+        // Get the start of the week (Sunday) for the selected date
+        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 0 });
+        const dateStr = format(weekStart, 'yyyy-MM-dd');
         scheduleResponse = await apiService.getWeekSchedule(clubId, dateStr);
       } else {
         // month view
@@ -94,9 +97,13 @@ export default function Dashboard() {
           // Check if booking spans midnight (overnight booking)
           const isOvernightBooking = bookingStartDateStr !== bookingEndDateStr;
           
-          // Determine color based on category color or default
-          let color: 'green' | 'blue' = 'green';
-          if (booking.categoryColor) {
+          // Determine color based on booking type and source
+          let color: 'green' | 'blue' | 'orange' = 'green';
+          if (booking.bookingType === 'COACH') {
+            color = 'orange';
+          } else if (booking.bookingType === 'FIXED') {
+            color = 'blue';
+          } else if (booking.categoryColor) {
             color = booking.categoryColor === '#3B82F6' ? 'blue' : 'green';
           }
           
@@ -313,7 +320,15 @@ export default function Dashboard() {
         <Header
           selectedCourt={courts.length > 0 ? `${courts.length} Courts Available` : 'No Courts'}
           onAddBooking={() => setIsBookingModalOpen(true)}
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          onToggleSidebar={() => {
+            // On mobile, toggle mobile sidebar; on desktop, toggle desktop sidebar
+            if (window.innerWidth < 768) {
+              setIsMobileSidebarOpen(!isMobileSidebarOpen);
+            } else {
+              setIsDesktopSidebarOpen(!isDesktopSidebarOpen);
+            }
+          }}
+          isSidebarOpen={isDesktopSidebarOpen}
         />
         {viewMode === 'day' && (
           <ScheduleView 
@@ -362,27 +377,30 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Desktop Sidebar */}
-      <Sidebar 
-        activeItem={activeMenuItem} 
-        onItemClick={handleMenuItemClick} 
-        isMobile={false}
-      />
+      {isDesktopSidebarOpen && (
+        <Sidebar 
+          activeItem={activeMenuItem} 
+          onItemClick={handleMenuItemClick} 
+          isMobile={false}
+        />
+      )}
       
       {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
+      {isMobileSidebarOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden" 
-            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden" 
+            onClick={() => setIsMobileSidebarOpen(false)}
           />
-          <div className="fixed left-0 top-0 h-full w-60 z-50 md:hidden">
+          <div className="fixed left-0 top-0 h-full w-60 z-50 md:hidden shadow-xl">
             <Sidebar 
               activeItem={activeMenuItem} 
               onItemClick={(item) => {
                 handleMenuItemClick(item);
-                setIsSidebarOpen(false);
+                setIsMobileSidebarOpen(false);
               }} 
               isMobile={true}
+              onClose={() => setIsMobileSidebarOpen(false)}
             />
           </div>
         </>

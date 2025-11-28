@@ -11,6 +11,7 @@ import {
   BarChart3,
   LogOut,
   CalendarX,
+  X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,9 +26,10 @@ interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
   isMobile?: boolean;
+  onClose?: () => void;
 }
 
-const Sidebar = ({ activeItem, onItemClick, isMobile = false }: SidebarProps) => {
+const Sidebar = ({ activeItem, onItemClick, isMobile = false, onClose }: SidebarProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -57,12 +59,25 @@ const Sidebar = ({ activeItem, onItemClick, isMobile = false }: SidebarProps) =>
     )}>
       {/* Header with Logo */}
       <div className="p-4 border-b border-border bg-card">
-        <div className="flex items-center justify-center">
-          <img
-            src={padelHubLogo}
-            alt="The Padel Hub"
-            className="h-8 w-auto object-contain max-w-[200px]"
-          />
+        <div className="flex items-center justify-between">
+          <div className="flex-1 flex items-center justify-center">
+            <img
+              src={padelHubLogo}
+              alt="The Padel Hub"
+              className="h-8 w-auto object-contain max-w-[200px] dark:brightness-0 dark:invert"
+            />
+          </div>
+          {isMobile && onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 -mr-2"
+              onClick={onClose}
+            >
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close sidebar</span>
+            </Button>
+          )}
         </div>
       </div>
 

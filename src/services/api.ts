@@ -117,12 +117,26 @@ export const apiService = {
   },
 
   getWeekSchedule: async (clubId: string, startDate: string) => {
-    const response = await api.get(`/clubs/${clubId}/schedule/week?startDate=${startDate}`);
+    // Calculate end date (7 days from start)
+    const start = new Date(startDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const endDate = end.toISOString().split('T')[0];
+    
+    const response = await api.get(`/clubs/${clubId}/schedule/week?from=${startDate}&to=${endDate}`);
     return response.data;
   },
 
   getMonthSchedule: async (clubId: string, year: number, month: number) => {
-    const response = await api.get(`/clubs/${clubId}/schedule/month?year=${year}&month=${month}`);
+    // Calculate first and last day of month
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0); // Day 0 of next month = last day of current month
+    
+    const fromDate = firstDay.toISOString().split('T')[0];
+    const toDate = lastDay.toISOString().split('T')[0];
+    
+    // Use the week endpoint with from/to params for month range
+    const response = await api.get(`/clubs/${clubId}/schedule/week?from=${fromDate}&to=${toDate}`);
     return response.data;
   },
 

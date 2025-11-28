@@ -29,8 +29,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onViewDetails,
 }) => {
   // 48px per half hour slot (12*4 = 48px) - card should fill the full space
-  const heightPerHalfHour = 48;
-  const cardHeight = Math.max(duration * heightPerHalfHour - 4, 44); // Minimum height with proper spacing
+  const heightPerHalfHour = 62;
+  const cardHeight = duration * heightPerHalfHour; // Minimum height with proper spacing
 
   // ✅ safely handle missing price, default to 300
   const priceToShow = booking.price ?? 300;
@@ -51,7 +51,9 @@ const BookingCard: React.FC<BookingCardProps> = ({
         "group absolute inset-x-1 top-1 flex items-stretch rounded-md overflow-hidden",
         "shadow-md cursor-grab transition-all hover:shadow-lg active:cursor-grabbing active:scale-[0.98]",
         "z-10 min-h-[36px]",
-        booking.color === 'blue' ? "bg-blue-600" : "bg-green-600",
+        booking.color === 'blue' && "bg-blue-600",
+        booking.color === 'green' && "bg-green-600",
+        booking.color === 'orange' && "bg-orange-500",
         "text-white"
       )}
       style={{ height: `${cardHeight}px` }}

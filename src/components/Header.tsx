@@ -2,6 +2,8 @@
 import {
   ChevronDown,
   Menu,
+  PanelLeftClose,
+  PanelLeft,
   Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -19,26 +21,44 @@ interface HeaderProps {
   selectedCourt: string;
   onAddBooking?: () => void;
   onToggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
 }
 
 const Header = ({
   selectedCourt,
   onAddBooking,
   onToggleSidebar,
+  isSidebarOpen = true,
 }: HeaderProps) => {
   const { t } = useTranslation();
 
   return (
-    <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-border bg-card px-4 sm:px-6 flex items-center justify-between">
       {/* LEFT SIDE – menu + dropdowns */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Mobile menu button */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="md:hidden" 
+          className="md:hidden h-9 w-9 p-0" 
           onClick={onToggleSidebar}
         >
           <Menu className="h-5 w-5" />
+        </Button>
+        
+        {/* Desktop sidebar toggle */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="hidden md:flex h-9 w-9 p-0" 
+          onClick={onToggleSidebar}
+          title={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+        >
+          {isSidebarOpen ? (
+            <PanelLeftClose className="h-5 w-5" />
+          ) : (
+            <PanelLeft className="h-5 w-5" />
+          )}
         </Button>
         
         {/* Mobile logo */}
@@ -46,7 +66,7 @@ const Header = ({
           <img
             src={padelHubLogo}
             alt="The Padel Hub"
-            className="h-6 w-auto object-contain max-w-[120px]"
+            className="h-6 w-auto object-contain max-w-[120px] dark:brightness-0 dark:invert"
           />
         </div>
         
