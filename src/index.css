@@ -1,553 +1,102 @@
-/* ===============================
-   GLOBAL BASE + LIGHT THEME
-   =============================== */
+@import "tailwindcss";
 
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ============================================
+   TAILWIND V4 THEME CONFIGURATION
+   ============================================ */
+@theme {
+  /* Border radius */
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
 
-  /* LIGHT THEME TOKENS */
-  --bg-body: #f4f6fb;
-  --bg-surface: #ffffff;
-  --bg-elevated: #ffffff;
-
-  --text-main: #111827;
-  --text-muted: #6b7280;
-
-  --border-subtle: #e5e7eb;
-
-  --primary: #22c55e;
-  --primary-strong: #16a34a;
-  --primary-soft: #bbf7d0;
-
-  --accent: #6366f1;
-  --accent-soft: #e0e7ff;
-
-  color-scheme: light;
-  color: var(--text-main);
-  background-color: var(--bg-body);
-
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Colors */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
 }
 
+/* ============================================
+   CSS VARIABLES FOR SHADCN/UI
+   ============================================ */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 142 76% 36%;
+  --radius: 0.5rem;
+}
+
+[data-theme="dark"] {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 142 76% 36%;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  border-color: hsl(var(--border));
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  overflow: hidden;
-  background: var(--bg-body);
-  color: var(--text-main);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-#root {
-  width: 100%;
-  height: 100vh;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  outline: none;
-}
-
-button:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* RTL Support */
-[dir='rtl'] {
-  direction: rtl;
-  text-align: right;
-}
-
-[dir='rtl'] .sidebar {
-  left: auto;
-  right: 0;
-}
-
-[dir='rtl'] .main-content {
-  margin-left: 0;
-  margin-right: 240px;
-}
-
-/* ===============================
-   DARK THEME TOKENS
-   =============================== */
-
-[data-theme='dark'] {
-  color-scheme: dark;
-
-  --bg-body: #020617;      /* whole page background */
-  --bg-surface: #020617;   /* big areas (header, main bg) */
-  --bg-elevated: #0b1120;  /* cards / containers */
-
-  --text-main: #e5e7eb;
-  --text-muted: #9ca3af;
-
-  --border-subtle: #1e293b;
-
-  --primary: #22c55e;
-  --primary-strong: #16a34a;
-  --primary-soft: #14532d;
-
-  --accent: #6366f1;
-  --accent-soft: #312e81;
-}
-
-/* ===============================
-   APP LAYOUT
-   =============================== */
-
-.app {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.main-content {
-  flex: 1;
-  margin-left: 240px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: opacity 0.2s ease-in-out, background 0.2s ease-in-out;
-}
-
-/* App background per theme */
-[data-theme='dark'] body {
-  background: var(--bg-body);
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .app {
-  background: var(--bg-body);
-}
-
-[data-theme='dark'] .main-content {
-  background: var(--bg-body);
-}
-
-/* ===============================
-   SIDEBAR
-   =============================== */
-
-.sidebar {
-  background: #f9fafb;
-  color: #111827;
-  border-right: 1px solid #e5e7eb;
-}
-
-.sidebar-header {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.sidebar-footer {
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-}
-
-/* dark */
-[data-theme='dark'] .sidebar {
-  background: var(--bg-surface);
-  color: var(--text-main);
-  border-right-color: var(--border-subtle);
-}
-
-[data-theme='dark'] .sidebar-header {
-  background: var(--bg-surface);
-  border-bottom-color: var(--border-subtle);
-}
-
-[data-theme='dark'] .sidebar-footer {
-  background: var(--bg-surface);
-  border-top-color: var(--border-subtle);
-}
-
-[data-theme='dark'] .section-title {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .menu-item {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .menu-item:hover {
-  background: #0a0d15;
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .menu-item.active {
-  background: #151716;;
-  color: #e5e7eb;
-}
-
-[data-theme='dark'] .user-name {
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .user-email {
-  color: var(--text-muted);
-}
-
-/* ===============================
-   HEADER
-   =============================== */
-
-.header,
-header {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-/* dark */
-[data-theme='dark'] .header,
-[data-theme='dark'] header {
-  background: var(--bg-surface);
-  border-bottom-color: var(--border-subtle);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
-}
-
-.dropdown {
-  background: #ffffff;
-  border-color: #e5e5e5;
-}
-
-/* dark dropdown */
-[data-theme='dark'] .dropdown {
-  background: #020617;
-  border-color: var(--border-subtle);
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .dropdown:hover {
-  border-color: var(--primary);
-}
-
-/* header right icon buttons (language, theme, +) */
-.icon-button {
-  background: #f8f9fa;
-  color: #666;
-}
-
-/* dark icon buttons */
-[data-theme='dark'] .icon-button {
-  background: #020617;
-  color: var(--text-main);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-}
-
-[data-theme='dark'] .icon-button:hover {
-  background: #111827;
-  color: var(--primary);
-}
-
-[data-theme='dark'] .add-button {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.45);
-}
-
-/* ===============================
-   SCHEDULE / WEEK / MONTH WRAPPERS
-   =============================== */
-
-.schedule-view,
-.week-view,
-.month-view {
-  background: #f4f6fb;
-}
-
-/* dark main backgrounds */
-[data-theme='dark'] .schedule-view,
-[data-theme='dark'] .week-view,
-[data-theme='dark'] .month-view {
-  background: var(--bg-body);
-}
-
-/* top controls */
-.schedule-controls {
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-/* dark controls */
-[data-theme='dark'] .schedule-controls {
-  background: var(--bg-surface);
-  border-bottom-color: var(--border-subtle);
-}
 
-/* prev/next buttons + date pill + view mode group */
-.schedule-nav-button,
-.schedule-date-display,
-.schedule-view-mode-selector,
-.date-display-wrapper {
-  background: #ffffff;
-  color: #0f172a;
-}
-
-/* dark versions */
-[data-theme='dark'] .schedule-nav-button,
-[data-theme='dark'] .schedule-date-display,
-[data-theme='dark'] .schedule-view-mode-selector,
-[data-theme='dark'] .date-display-wrapper {
-  background: #020617;
-  border-color: var(--border-subtle);
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-}
-
-/* view mode buttons text */
-[data-theme='dark'] .schedule-view-mode-button {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .schedule-view-mode-button.active {
-  background: #111827;
-  color: #e3e5f0;
-}
-
-/* ===============================
-   WEEK & MONTH CONTAINERS / GRID
-   =============================== */
-
-.week-container,
-.month-container,
-.schedule-container {
-  background: #ffffff;
-}
-
-/* dark containers */
-[data-theme='dark'] .week-container,
-[data-theme='dark'] .month-container,
-[data-theme='dark'] .schedule-container {
-  background: var(--bg-elevated);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-}
-
-/* headers */
-[data-theme='dark'] .week-header,
-[data-theme='dark'] .schedule-header,
-[data-theme='dark'] .calendar-grid {
-  background: #020617;
-  border-color: var(--border-subtle);
-}
-
-/* column/row headers and cells */
-[data-theme='dark'] .time-column-header,
-[data-theme='dark'] .day-header,
-[data-theme='dark'] .weekday-header,
-[data-theme='dark'] .calendar-day,
-[data-theme='dark'] .court-header,
-[data-theme='dark'] .time-slot,
-[data-theme='dark'] .court-cell-half {
-  background: #020617;
-  color: var(--text-main);
-}
-
-/* court label text */
-[data-theme='dark'] .court-name,
-[data-theme='dark'] .day-name,
-[data-theme='dark'] .month-title {
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .court-capacity,
-[data-theme='dark'] .day-date,
-[data-theme='dark'] .weekday-header {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .calendar-day.other-month {
-  opacity: 0.4;
-}
-
-/* today and selected in month calendar */
-[data-theme='dark'] .calendar-day.today {
-  background: radial-gradient(circle at top left, #064e3b, #022c22);
-  border-color: var(--primary);
-}
-
-[data-theme='dark'] .calendar-day.selected {
-  background: radial-gradient(circle at top left, #1e3a8a, #020617);
-  border-color: var(--accent);
-}
-
-/* month booking pills */
-[data-theme='dark'] .month-booking.green {
-  background: rgba(34, 197, 94, 0.16);
-  border-left-color: #4ade80;
-  color: #bbf7d0;
-}
-
-[data-theme='dark'] .month-booking.blue {
-  background: rgba(59, 130, 246, 0.16);
-  border-left-color: #60a5fa;
-  color: #bfdbfe;
-}
-
-/* ===============================
-   DATE PICKER DROPDOWN
-   =============================== */
-
-.date-picker-dropdown {
-  background: #ffffff;
-}
-
-/* dark date picker */
-[data-theme='dark'] .date-picker-dropdown {
-  background: #020617;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
-}
-
-[data-theme='dark'] .date-picker-header {
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .date-picker-nav-btn {
-  background: #111827;
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .date-picker-weekdays span {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .date-picker-day {
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .date-picker-day--faded {
-  color: #4b5563;
-}
-
-/* ===============================
-   BOOKING CARDS (day view)
-   =============================== */
-
-/* base colors are in BookingCard.css; here just tweak for dark */
-
-[data-theme='dark'] .booking-card {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
-}
-
-[data-theme='dark'] .booking-card.green {
-  background: linear-gradient(135deg, #16a34a 0%, #14532d 100%);
-}
-
-[data-theme='dark'] .booking-card.blue {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-}
-
-/* ===============================
-   MODALS (BookingModal, Details)
-   =============================== */
-
-.modal-content,
-.booking-details-modal {
-  background: #ffffff;
-  color: #0f172a;
-}
-
-/* dark modals */
-[data-theme='dark'] .modal-overlay,
-[data-theme='dark'] .booking-details-overlay {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(4px);
-}
-
-[data-theme='dark'] .modal-content,
-[data-theme='dark'] .booking-details-modal {
-  background: var(--bg-elevated);
-  color: var(--text-main);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-}
-
-[data-theme='dark'] .modal-header,
-[data-theme='dark'] .modal-tabs {
-  background: #020617;
-  border-bottom-color: var(--border-subtle);
-}
-
-[data-theme='dark'] .form-group label {
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .form-group input,
-[data-theme='dark'] .form-group select,
-[data-theme='dark'] textarea {
-  background: #020617;
-  border-color: var(--border-subtle);
-  color: var(--text-main);
-}
-
-[data-theme='dark'] .form-group input::placeholder,
-[data-theme='dark'] textarea::placeholder {
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .btn-cancel {
-  background: #020617;
-  color: var(--text-muted);
-}
-
-[data-theme='dark'] .btn-cancel:hover {
-  background: #111827;
-}
-
-[data-theme='dark'] .btn-submit {
-  background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
-}
-
-/* booking details rows hover */
-[data-theme='dark'] .booking-details-row:hover {
-  background: #020617;
-}
-
-/* ===============================
-   SCROLLBARS (optional, subtle)
-   =============================== */
-
-.week-container::-webkit-scrollbar,
-.week-courts::-webkit-scrollbar,
-.week-day-cell::-webkit-scrollbar,
-.month-container::-webkit-scrollbar,
-.month-calendar::-webkit-scrollbar,
-.schedule-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.week-container::-webkit-scrollbar-thumb,
-.week-courts::-webkit-scrollbar-thumb,
-.week-day-cell::-webkit-scrollbar-thumb,
-.month-container::-webkit-scrollbar-thumb,
-.month-calendar::-webkit-scrollbar-thumb,
-.schedule-container::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
-  border-radius: 10px;
-}
-
-[data-theme='dark'] .week-container::-webkit-scrollbar-thumb,
-[data-theme='dark'] .week-courts::-webkit-scrollbar-thumb,
-[data-theme='dark'] .week-day-cell::-webkit-scrollbar-thumb,
-[data-theme='dark'] .month-container::-webkit-scrollbar-thumb,
-[data-theme='dark'] .month-calendar::-webkit-scrollbar-thumb,
-[data-theme='dark'] .schedule-container::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.9);
-}

@@ -1,6 +1,6 @@
 // src/components/LanguageSwitcher.tsx
 import { useTranslation } from 'react-i18next';
-import './LanguageSwitcher.css';
+import { Button } from '@/components/ui/button';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
@@ -15,16 +15,17 @@ const LanguageSwitcher = () => {
   const isEnglish = i18n.language === 'en';
 
   return (
-    <button
-      className="language-switcher icon-button"
-      type="button"
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={toggleLanguage}
+      className="h-9 w-9 p-0"
       aria-label={isEnglish ? 'Switch to Arabic' : 'Switch to English'}
     >
-      <span className="flag-icon" aria-hidden="true">
+      <span className="text-lg" aria-hidden="true">
         {isEnglish ? '🇬🇧' : '🇸🇦'}
       </span>
-    </button>
+    </Button>
   );
 };
 

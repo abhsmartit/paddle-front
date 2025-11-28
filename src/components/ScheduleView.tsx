@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState } from 'react';
 import {
   format,
   addMonths,
@@ -12,10 +12,18 @@ import {
   isSameDay,
 } from 'date-fns';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { Booking, Court, ViewMode } from '../types';
 import BookingCard from './BookingCard';
 import BookingDetailsModal from './BookingDetailsModal';
-import './ScheduleView.css';
 
 interface ScheduleViewProps {
   courts: Court[];
@@ -101,9 +109,7 @@ const ScheduleView = ({
     setDraggedBooking(null);
   };
 
-  const toggleCalendar = () => {
-    setIsCalendarOpen((prev) => !prev);
-  };
+
 
   const handleDateSelect = (date: Date) => {
     onDateChange(date);
@@ -170,188 +176,207 @@ const ScheduleView = ({
     return e - s;
   };
 
+  // Calculate grid template columns based on court count
+  const getGridStyle = () => {
+    if (courts.length === 0) return { gridTemplateColumns: '1fr' };
+    const courtColumns = courts.map(() => 'minmax(150px, 1fr)').join(' ');
+    return { gridTemplateColumns: `100px ${courtColumns}` };
+  };
+
   return (
-    <div className="schedule-view">
-      {/* --- Controls Header --- */}
-      <div className="schedule-controls-header">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+      {/* Controls Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-card border-b border-border">
         {/* Previous / Next Buttons */}
-        <div className="nav-group">
-          <button className="schedule-nav-button" onClick={handlePrevious}>
-            <ChevronLeft size={18} />
-            <span>Previous</span>
-          </button>
-          <button className="schedule-nav-button" onClick={handleNext}>
-            <span>Next</span>
-            <ChevronRight size={18} />
-          </button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrevious}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Previous</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleNext}>
+            <span className="hidden sm:inline">Next</span>
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
         </div>
 
         {/* Date Display + Calendar */}
-        <div className="date-display-container">
-          <button
-            type="button"
-            className="date-display-wrapper"
-            onClick={toggleCalendar}
-          >
-            <span>{format(selectedDate, 'EEEE, MMM dd')}</span>
-            <ChevronDown size={16} />
-          </button>
+        <div className="relative">
+          <DropdownMenu open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2 min-w-[180px]">
+                <span className="font-medium">{format(selectedDate, 'EEEE, MMM dd')}</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80" align="center">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDateChange(subMonths(selectedDate, 1))}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <h3 className="font-semibold">{format(selectedDate, 'MMMM yyyy')}</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDateChange(addMonths(selectedDate, 1))}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
 
-          {isCalendarOpen && (
-            <div className="date-picker-dropdown">
-              <div className="date-picker-header">
-                <button
-                  type="button"
-                  className="date-picker-nav-btn"
-                  onClick={() => onDateChange(subMonths(selectedDate, 1))}
-                >
-                  ‹
-                </button>
-                <span className="date-picker-month-label">
-                  {format(selectedDate, 'MMMM yyyy')}
-                </span>
-                <button
-                  type="button"
-                  className="date-picker-nav-btn"
-                  onClick={() => onDateChange(addMonths(selectedDate, 1))}
-                >
-                  ›
-                </button>
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1">
+                  {calendarDays.map((day) => {
+                    const inCurrentMonth = isSameMonth(day, monthStart);
+                    const selected = isSameDay(day, selectedDate);
+
+                    return (
+                      <Button
+                        key={day.toISOString()}
+                        variant={selected ? "default" : "ghost"}
+                        size="sm"
+                        className={cn(
+                          "h-8 w-8 p-0 font-normal",
+                          !inCurrentMonth && "text-muted-foreground opacity-50",
+                          selected && "bg-primary text-primary-foreground"
+                        )}
+                        onClick={() => handleDateSelect(day)}
+                      >
+                        {format(day, 'd')}
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
-
-              <div className="date-picker-weekdays">
-                <span>Sun</span>
-                <span>Mon</span>
-                <span>Tue</span>
-                <span>Wed</span>
-                <span>Thu</span>
-                <span>Fri</span>
-                <span>Sat</span>
-              </div>
-
-              <div className="date-picker-grid">
-                {calendarDays.map((day) => {
-                  const inCurrentMonth = isSameMonth(day, monthStart);
-                  const selected = isSameDay(day, selectedDate);
-
-                  return (
-                    <button
-                      type="button"
-                      key={day.toISOString()}
-                      className={[
-                        'date-picker-day',
-                        inCurrentMonth ? '' : 'date-picker-day--faded',
-                        selected ? 'date-picker-day--selected' : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
-                      onClick={() => handleDateSelect(day)}
-                    >
-                      {format(day, 'd')}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* View Mode Buttons */}
-        <div className="view-toggle">
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'month' ? 'active' : ''}`}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <Button
+            variant={viewMode === 'month' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'month' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('month')}
           >
             Month
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'week' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'week' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'week' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('week')}
           >
             Week
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'day' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'day' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'day' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('day')}
           >
             Day
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* --- Schedule Grid --- */}
-      <div className="schedule-container">
-        <div className="schedule-header">
-          <div className="time-column-header"></div>
-          {courts.map((court) => (
-            <div key={court.id || court._id} className="court-header">
-              <div className="court-name">{court.name}</div>
-              <div className="court-capacity">({court.capacity})</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="schedule-grid">
-          {timeSlots.map((time, slotIndex) => (
-            <Fragment key={time}>
-              <div className="time-slot">{time}</div>
-              {courts.map((court) => {
-                const courtId = court.id || court._id || '';
-
-                const slotBooking = dayBookings.find((booking) => {
-                  // For overnight bookings ending today, they start at slot 0
-                  if (booking.isOvernightBooking && booking.endDate === currentDateStr) {
-                    const e = getSlotIndex(booking.endTime);
-                    return (
-                      booking.courtId === courtId &&
-                      slotIndex >= 0 &&
-                      slotIndex < e
-                    );
-                  }
-                  
-                  // For regular bookings or bookings starting today
-                  const s = getSlotIndex(booking.startTime);
-                  let e = getSlotIndex(booking.endTime);
-                  
-                  if (e <= s) e += 48; // Overnight booking
-                  
-                  return (
-                    booking.courtId === courtId &&
-                    slotIndex >= s &&
-                    slotIndex <= e
-                  );
-                });
-                console.log(slotBooking ,"slotBooking");
-                
-
-                const isStart =
-                  slotBooking &&
-                  ((slotBooking.isOvernightBooking && slotBooking.endDate === currentDateStr && slotIndex === 0) ||
-                   (getSlotIndex(slotBooking.startTime) === slotIndex));
-
-                return (
-                  <div
-                    key={`${courtId}-${slotIndex}`}
-                    className={`court-cell-half ${
-                      slotBooking ? 'has-booking' : ''
-                    } ${slotBooking?.color || ''}`}
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(courtId, slotIndex)}
-                  >
-                    {isStart && slotBooking && (
-                      <BookingCard
-                        booking={slotBooking}
-                        duration={getDisplayDuration(slotBooking)}
-                        onDragStart={() => handleDragStart(slotBooking)}
-                        onViewDetails={handleViewDetails}
-                      />
-                    )}
+      {/* Schedule Grid */}
+      <div className="flex-1 overflow-hidden p-4">
+        <Card className="h-full overflow-hidden border shadow-sm">
+          <ScrollArea className="h-full">
+            <div style={{ minWidth: courts.length > 3 ? `${100 + courts.length * 150}px` : 'auto' }}>
+              {/* Header */}
+              <div className="sticky top-0 z-20 bg-card border-b-2 border-border">
+                <div className="grid" style={getGridStyle()}>
+                  <div className="p-3 bg-muted/50 border-r border-border flex items-center justify-center">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Time</span>
                   </div>
-                );
-              })}
-            </Fragment>
-          ))}
-        </div>
+                  {courts.map((court) => (
+                    <div key={court.id || court._id} className="p-3 bg-muted/30 text-center border-r border-border last:border-r-0">
+                      <div className="font-semibold text-sm text-foreground">{court.name}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">({court.capacity})</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time slots and courts grid */}
+              <div>
+                {timeSlots.map((time, slotIndex) => (
+                  <div key={time} className="grid" style={getGridStyle()}>
+                    <div className="h-12 px-2 bg-card text-xs text-muted-foreground flex items-center justify-center border-r border-b border-border font-medium">
+                      {time}
+                    </div>
+                    {courts.map((court) => {
+                      const courtId = court.id || court._id || '';
+
+                      const slotBooking = dayBookings.find((booking) => {
+                        if (booking.isOvernightBooking && booking.endDate === currentDateStr) {
+                          const e = getSlotIndex(booking.endTime);
+                          return (
+                            booking.courtId === courtId &&
+                            slotIndex >= 0 &&
+                            slotIndex < e
+                          );
+                        }
+                        
+                        const s = getSlotIndex(booking.startTime);
+                        let e = getSlotIndex(booking.endTime);
+                        
+                        if (e <= s) e += 48;
+                        
+                        return (
+                          booking.courtId === courtId &&
+                          slotIndex >= s &&
+                          slotIndex <= e
+                        );
+                      });
+
+                      const isStart =
+                        slotBooking &&
+                        ((slotBooking.isOvernightBooking && slotBooking.endDate === currentDateStr && slotIndex === 0) ||
+                         (getSlotIndex(slotBooking.startTime) === slotIndex));
+
+                      return (
+                        <div
+                          key={`${courtId}-${slotIndex}`}
+                          className={cn(
+                            "h-12 bg-card border-r border-b border-border relative overflow-visible",
+                            "last:border-r-0 hover:bg-accent/10 transition-colors",
+                            slotBooking && "bg-transparent hover:bg-transparent"
+                          )}
+                          onDragOver={handleDragOver}
+                          onDrop={() => handleDrop(courtId, slotIndex)}
+                        >
+                          {isStart && slotBooking && (
+                            <BookingCard
+                              booking={slotBooking}
+                              duration={getDisplayDuration(slotBooking)}
+                              onDragStart={() => handleDragStart(slotBooking)}
+                              onViewDetails={handleViewDetails}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+        </Card>
       </div>
 
       {/* Booking Details Modal */}

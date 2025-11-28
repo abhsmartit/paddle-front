@@ -11,42 +11,36 @@ function App() {
 
   if (isLoading) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        fontSize: '18px',
-        color: '#667eea'
-      }}>
-        Loading...
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg font-medium text-primary animate-pulse">
+          Loading...
+        </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-background text-foreground">
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
+          className: 'border shadow-lg',
           style: {
-            background: '#fff',
-            color: '#333',
-            padding: '16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            background: 'hsl(var(--background))',
+            color: 'hsl(var(--foreground))',
+            border: '1px solid hsl(var(--border))',
           },
           success: {
             iconTheme: {
-              primary: '#10b981',
-              secondary: '#fff',
+              primary: 'hsl(var(--primary))',
+              secondary: 'hsl(var(--primary-foreground))',
             },
           },
           error: {
             iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
+              primary: 'hsl(var(--destructive))',
+              secondary: 'hsl(var(--destructive-foreground))',
             },
           },
         }}
@@ -67,7 +61,7 @@ function App() {
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

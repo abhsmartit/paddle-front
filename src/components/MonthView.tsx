@@ -12,8 +12,16 @@ import {
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { enUS, ar } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { Booking, ViewMode } from '../types';
-import './MonthView.css';
 
 interface MonthViewProps {
   bookings: Booking[];
@@ -85,113 +93,127 @@ const MonthView = ({ bookings, selectedDate, viewMode, onDateChange, onViewModeC
   });
 
   return (
-    <div className="month-view">
-      <div className="schedule-controls">
-        <div className="schedule-nav-left">
-          <button className="schedule-nav-button" onClick={handlePrevious}>
-            <ChevronLeft size={20} />
-            <span>{t('previous')}</span>
-          </button>
-          <button className="schedule-nav-button" onClick={handleNext}>
-            <span>{t('next')}</span>
-            <ChevronRight size={20} />
-          </button>
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+      {/* Controls Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-card border-b border-border">
+        {/* Previous / Next Buttons */}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrevious}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">{t('previous')}</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleNext}>
+            <span className="hidden sm:inline">{t('next')}</span>
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
         </div>
 
-        <div className="schedule-date-display">
-          <span>{format(selectedDate, 'MMMM yyyy', { locale })}</span>
-          <ChevronDown size={18} />
-        </div>
+        {/* Date Display */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2 min-w-[180px]">
+              <span className="font-medium">{format(selectedDate, 'MMMM yyyy', { locale })}</span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-2">
+            <div className="text-sm text-muted-foreground">Calendar picker coming soon</div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <div className="schedule-view-mode-selector">
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'month' ? 'active' : ''}`}
+        {/* View Mode Buttons */}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <Button
+            variant={viewMode === 'month' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'month' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('month')}
           >
             {t('month')}
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'week' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'week' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'week' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('week')}
           >
             {t('week')}
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'day' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'day' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'day' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('day')}
           >
             {t('day')}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="month-container">
-        {/* <div className="month-header">
-          <div className="month-title">
-            {format(selectedDate, 'MMMM yyyy', { locale })}
-          </div>
-        </div> */}
-
-        <div className="month-calendar">
-          {/* Weekday headers */}
-          <div className="weekday-headers">
-            {weekDays.map((day, index) => (
-              <div key={index} className="weekday-header">
-                {day}
+      {/* Month Grid */}
+      <div className="flex-1 overflow-hidden p-4">
+        <Card className="h-full overflow-hidden border shadow-sm">
+          <ScrollArea className="h-full">
+            <div className="p-4">
+              {/* Weekday headers */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {weekDays.map((day, index) => (
+                  <div key={index} className="p-2 text-center text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    {day}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Calendar grid */}
-          <div className="calendar-grid">
-            {days.map((day, index) => {
-              const dayBookings = getBookingsForDay(day);
-              const isCurrentMonth = isSameMonth(day, selectedDate);
-              const isToday =
-                format(day, 'yyyy-MM-dd') ===
-                format(new Date(), 'yyyy-MM-dd');
-              const isSelected =
-                format(day, 'yyyy-MM-dd') ===
-                format(selectedDate, 'yyyy-MM-dd');
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((day, index) => {
+                  const dayBookings = getBookingsForDay(day);
+                  const isCurrentMonth = isSameMonth(day, selectedDate);
+                  const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+                  const isSelected = format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
 
-              return (
-                <div
-                  key={index}
-                  className={`calendar-day ${
-                    !isCurrentMonth ? 'other-month' : ''
-                  } ${isToday ? 'today' : ''} ${
-                    isSelected ? 'selected' : ''
-                  }`}
-                >
-                  <div className="day-number">
-                    {format(day, 'd')}
-                  </div>
-                  <div className="day-bookings">
-                    {dayBookings.slice(0, 3).map((booking) => (
-                      <div
-                        key={booking.id}
-                        className={`month-booking ${booking.color}`}
-                        title={`${booking.playerName} - ${formatTime(
-                          booking.startTime,
-                        )} to ${formatTime(booking.endTime)}`}
-                      >
-                        <span className="booking-dot"></span>
-                        <span className="booking-text">
-                          {booking.playerName}
-                        </span>
+                  return (
+                    <div
+                      key={index}
+                      className={cn(
+                        "min-h-[100px] p-2 border border-border rounded-md bg-card",
+                        !isCurrentMonth && "opacity-50 bg-muted/30",
+                        isToday && "ring-2 ring-primary",
+                        isSelected && "bg-primary/10"
+                      )}
+                    >
+                      <div className={cn(
+                        "text-sm font-medium mb-1",
+                        isToday && "text-primary font-bold"
+                      )}>
+                        {format(day, 'd')}
                       </div>
-                    ))}
-                    {dayBookings.length > 3 && (
-                      <div className="more-bookings">
-                        +{dayBookings.length - 3} more
+                      <div className="flex flex-col gap-1">
+                        {dayBookings.slice(0, 3).map((booking) => (
+                          <div
+                            key={booking.id}
+                            className={cn(
+                              "px-2 py-1 rounded text-xs text-white truncate cursor-pointer hover:opacity-90",
+                              booking.color === 'blue' ? "bg-blue-600" : "bg-green-600"
+                            )}
+                            title={`${booking.playerName} - ${formatTime(booking.startTime)} to ${formatTime(booking.endTime)}`}
+                          >
+                            {booking.playerName}
+                          </div>
+                        ))}
+                        {dayBookings.length > 3 && (
+                          <div className="text-xs text-muted-foreground font-medium">
+                            +{dayBookings.length - 3} more
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </ScrollArea>
+        </Card>
       </div>
     </div>
   );

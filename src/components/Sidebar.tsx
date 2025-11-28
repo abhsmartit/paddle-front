@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
-import './Sidebar.css';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 // ✅ Use your EXACT uploaded image
 import padelHubLogo from "../assets/image.png";
@@ -22,9 +24,10 @@ import padelHubLogo from "../assets/image.png";
 interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
+  isMobile?: boolean;
 }
 
-const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
+const Sidebar = ({ activeItem, onItemClick, isMobile = false }: SidebarProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -48,75 +51,121 @@ const Sidebar = ({ activeItem, onItemClick }: SidebarProps) => {
   ];
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <div className="logo">
-          {/* 🎾 EXACT uploaded logo, perfect alignment */}
+    <div className={cn(
+      "w-60 h-full bg-card border-r border-border flex flex-col shrink-0",
+      !isMobile && "hidden md:flex"
+    )}>
+      {/* Header with Logo */}
+      <div className="p-4 border-b border-border bg-card">
+        <div className="flex items-center justify-center">
           <img
             src={padelHubLogo}
             alt="The Padel Hub"
-            className="logo-image"
+            className="h-8 w-auto object-contain max-w-[200px]"
           />
         </div>
       </div>
 
-      <div className="sidebar-content">
-        <div className="menu-section">
-          <div className="section-title">SCHEDULE</div>
-          {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className={`menu-item ${activeItem === item.id ? 'active' : ''}`}
-              onClick={() => onItemClick(item.id)}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
+      {/* Navigation Content */}
+      <ScrollArea className="flex-1 p-4">
+        <nav className="space-y-8">
+          {/* Schedule Section */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+              SCHEDULE
+            </h3>
+            <div className="space-y-1">
+              {menuItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={activeItem === item.id ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-9 px-2 font-normal",
+                    activeItem === item.id && "bg-accent text-accent-foreground"
+                  )}
+                  onClick={() => onItemClick(item.id)}
+                >
+                  <item.icon className="mr-3 h-4 w-4" />
+                  <span className="truncate">{item.label}</span>
+                </Button>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <div className="menu-section">
-          <div className="section-title">COACHES</div>
-          {coachItems.map((item) => (
-            <div
-              key={item.id}
-              className={`menu-item ${activeItem === item.id ? 'active' : ''}`}
-              onClick={() => onItemClick(item.id)}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="menu-section">
-          <div className="section-title">BILLING</div>
-          {billingItems.map((item) => (
-            <div
-              key={item.id}
-              className={`menu-item ${activeItem === item.id ? 'active' : ''}`}
-              onClick={() => onItemClick(item.id)}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <div className="user-avatar">{user?.fullName?.charAt(0).toUpperCase() || 'A'}</div>
-          <div className="user-details">
-            <div className="user-name">{user?.fullName || 'Admin'}</div>
-            <div className="user-email">{user?.email || 'admin@padelclub.com'}</div>
           </div>
-          <LogOut
-            size={18}
-            className="logout-icon"
+
+          {/* Coaches Section */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+              COACHES
+            </h3>
+            <div className="space-y-1">
+              {coachItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={activeItem === item.id ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-9 px-2 font-normal",
+                    activeItem === item.id && "bg-accent text-accent-foreground"
+                  )}
+                  onClick={() => onItemClick(item.id)}
+                >
+                  <item.icon className="mr-3 h-4 w-4" />
+                  <span className="truncate">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Billing Section */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+              BILLING
+            </h3>
+            <div className="space-y-1">
+              {billingItems.map((item) => (
+                <Button
+                  key={item.id}
+                  variant={activeItem === item.id ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start h-9 px-2 font-normal",
+                    activeItem === item.id && "bg-accent text-accent-foreground"
+                  )}
+                  onClick={() => onItemClick(item.id)}
+                >
+                  <item.icon className="mr-3 h-4 w-4" />
+                  <span className="truncate">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </ScrollArea>
+
+      {/* Footer with User Info */}
+      <div className="p-4 border-t border-border bg-card">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
+            {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">
+              {user?.fullName || 'Admin'}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.email || 'admin@padelclub.com'}
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
             onClick={() => onItemClick('logout')}
-            style={{ cursor: 'pointer' }}
-          />
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="sr-only">Logout</span>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,8 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { X, Calendar, Repeat, Dumbbell, Home } from 'lucide-react';
+import { Calendar, Repeat, Dumbbell, Home, Trash2 } from 'lucide-react';
 import { apiService } from '../services/api';
-import type { Court, ApiBookingCategory, CreateBookingRequest, CreateFixedBookingRequest, Customer, Coach, ClosedDate } from '../types';
+import type { Court, ApiBookingCategory, CreateBookingRequest, CreateFixedBookingRequest, ClosedDate } from '../types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import './BookingModal.css';
 
 interface BookingModalProps {
@@ -34,7 +54,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
   const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   
   // Fixed booking specific states
@@ -45,7 +65,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
   
   // Coach booking specific states
   const [selectedCoach, setSelectedCoach] = useState('');
-  const [coaches, setCoaches] = useState<Coach[]>([]);
+  // const [coaches, setCoaches] = useState<Coach[]>([]);
 
   // Close Stadium specific states
   const [closedDates, setClosedDates] = useState<ClosedDate[]>([]);
@@ -74,8 +94,8 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
 
   const loadCoaches = useCallback(async () => {
     try {
-      const coachesData = await apiService.getCoaches(clubId);
-      setCoaches(coachesData);
+      // const coachesData = await apiService.getCoaches(clubId);
+      // setCoaches(coachesData);
     } catch (err) {
       console.error('Failed to load coaches:', err);
       toast.error('Failed to load coaches');
@@ -123,7 +143,7 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
     
     try {
       const customersData = await apiService.getCustomers(clubId, phoneNumber);
-      setCustomers(customersData);
+      // setCustomers(customersData);
       
       if (customersData.length === 1) {
         const customer = customersData[0];
@@ -439,302 +459,336 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
 
   // Render Close Stadium Tab Content
   const renderCloseStadiumTab = () => (
-    <div className="modal-form">
+    <div className="space-y-6">
       {error && (
-        <div style={{
-          padding: '12px',
-          backgroundColor: '#fee',
-          color: '#c00',
-          borderRadius: '8px',
-          marginBottom: '16px',
-          fontSize: '14px'
-        }}>
+        <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
           {error}
         </div>
       )}
 
-      <div className="close-stadium-content">
-        <h3>Stadium Closed Dates</h3>
-        
-        {/* Add new closed date */}
-        <div className="add-closed-date-section">
-          <h4>Add New Closed Date</h4>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="newClosedDate">Date</label>
-              <input
-                type="date"
-                id="newClosedDate"
-                value={newClosedDate}
-                onChange={(e) => setNewClosedDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-              />
+      <Card>
+        <CardHeader>
+          <CardTitle>Stadium Closed Dates</CardTitle>
+          <CardDescription>
+            Manage dates when the stadium will be closed for maintenance or holidays.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Add new closed date */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Add New Closed Date</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="newClosedDate">Date</Label>
+                <Input
+                  type="date"
+                  id="newClosedDate"
+                  value={newClosedDate}
+                  onChange={(e) => setNewClosedDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="closedReason">Reason</Label>
+                <Input
+                  type="text"
+                  id="closedReason"
+                  value={closedReason}
+                  onChange={(e) => setClosedReason(e.target.value)}
+                  placeholder="e.g., New Year Day, Maintenance"
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="closedReason">Reason</label>
-              <input
-                type="text"
-                id="closedReason"
-                value={closedReason}
-                onChange={(e) => setClosedReason(e.target.value)}
-                placeholder="e.g., New Year Day, Maintenance"
-              />
-            </div>
+            <Button 
+              type="button" 
+              onClick={handleAddClosedDate}
+              disabled={loading || !newClosedDate || !closedReason}
+            >
+              {loading ? 'Adding...' : 'Add Closed Date'}
+            </Button>
           </div>
-          <button 
-            type="button" 
-            className="btn-add-closed-date"
-            onClick={handleAddClosedDate}
-            disabled={loading || !newClosedDate || !closedReason}
-          >
-            {loading ? 'Adding...' : 'Add Closed Date'}
-          </button>
-        </div>
 
-        {/* Display existing closed dates */}
-        <div className="existing-closed-dates-section">
-          <h4>Existing Closed Dates</h4>
-          {closedDates.length === 0 ? (
-            <div className="no-closed-dates">
-              <p>No closed dates scheduled. Stadium is available on all dates.</p>
-            </div>
-          ) : (
-            <div className="closed-dates-list">
-              {closedDates
-                .sort((a, b) => new Date(a.closedDate).getTime() - new Date(b.closedDate).getTime())
-                .map((closedDate) => (
-                <div key={closedDate._id} className="closed-date-item">
-                  <div className="closed-date-info">
-                    <span className="closed-date-date">{formatDisplayDate(closedDate.closedDate)}</span>
-                    <span className="closed-date-reason">{closedDate.reason}</span>
+          {/* Display existing closed dates */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Existing Closed Dates</h4>
+            {closedDates.length === 0 ? (
+              <div className="p-4 text-center text-muted-foreground border border-dashed rounded-lg">
+                <p>No closed dates scheduled. Stadium is available on all dates.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {closedDates
+                  .sort((a, b) => new Date(a.closedDate).getTime() - new Date(b.closedDate).getTime())
+                  .map((closedDate) => (
+                  <div key={closedDate._id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="space-y-1">
+                      <div className="font-medium">{formatDisplayDate(closedDate.closedDate)}</div>
+                      <div className="text-sm text-muted-foreground">{closedDate.reason}</div>
+                    </div>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteClosedDate(closedDate._id)}
+                      disabled={loading}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <button 
-                    type="button"
-                    className="btn-delete-closed-date"
-                    onClick={() => handleDeleteClosedDate(closedDate._id)}
-                    disabled={loading}
-                    title="Delete closed date"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="modal-actions">
-        <button type="button" className="btn-cancel" onClick={onClose}>
-          Close
-        </button>
-      </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-tabs">
-          <div className="tabs-container">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>Booking Management</DialogTitle>
+        </DialogHeader>
+        
+        <Tabs defaultValue="single" value={activeTab} onValueChange={(value) => setActiveTab(value as BookingTab)}>
+          <TabsList className="grid w-full grid-cols-4">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
-                <button
-                  key={tab.id}
-                  className={`modal-tab ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id as BookingTab)}
-                >
-                  <Icon size={18} />
-                  <span>{tab.label}</span>
-                </button>
+                <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+                  <Icon size={16} />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </TabsTrigger>
               );
             })}
-          </div>
-          <button className="modal-close-button" onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+          </TabsList>
 
-        {activeTab === 'close' ? renderCloseStadiumTab() : (
-          <form className="modal-form" onSubmit={handleSubmit}>
-            {error && (
-              <div style={{
-                padding: '12px',
-                backgroundColor: '#fee',
-                color: '#c00',
-                borderRadius: '8px',
-                marginBottom: '16px',
-                fontSize: '14px'
-              }}>
-                {error}
-              </div>
-            )}
+          <TabsContent value="close" className="mt-6">
+            <ScrollArea className="h-[60vh]">
+              {renderCloseStadiumTab()}
+            </ScrollArea>
+          </TabsContent>
 
-            {/* Common fields for all booking types */}
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="bookingName">Booking Name *</label>
-                <input
-                  type="text"
-                  id="bookingName"
-                  value={bookingName}
-                  onChange={(e) => setBookingName(e.target.value)}
-                  placeholder="Enter booking name"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number *</label>
-                <div className="phone-input-wrapper">
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="+966 xxx xxx xxx"
-                    required
-                  />
-                  <button 
-                    type="button" 
-                    className="search-icon-button"
-                    onClick={searchCustomer}
-                    title="Search customer"
-                  >
-                    🔍
-                  </button>
-                </div>
-                <small className="form-hint">
-                  Search by name or phone number, or click the search icon.
-                </small>
-              </div>
-            </div>
-
-            {/* Coach Booking specific: Coach selection */}
-            {activeTab === 'coach' && (
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="coach">Coach *</label>
-                  <select
-                    id="coach"
-                    value={selectedCoach}
-                    onChange={(e) => setSelectedCoach(e.target.value)}
-                    required
-                  >
-                    <option value="">Select coach</option>
-                    {coaches.map((coach) => (
-                      <option key={coach._id || coach.id} value={coach._id || coach.id}>
-                        {coach.name || coach.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="duration">Duration *</label>
-                <select
-                  id="duration"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  required
-                >
-                  {durationOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="startTime">Starting Time *</label>
-                <input
-                  type="time"
-                  id="startTime"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="startingDate">Starting Date *</label>
-                <input
-                  type="date"
-                  id="startingDate"
-                  value={startingDate}
-                  onChange={(e) => {
-                    const selectedDate = e.target.value;
-                    if (isDateClosed(selectedDate)) {
-                      setError('This date is closed. Please select a different date.');
-                    } else {
-                      setError(null);
-                    }
-                    setStartingDate(selectedDate);
-                  }}
-                  min={formatDateForComparison(new Date())}
-                  className={isDateClosed(startingDate) ? 'date-closed' : ''}
-                  required
-                />
-                {isDateClosed(startingDate) && (
-                  <small className="date-closed-warning">
-                    ⚠️ This date is closed: {closedDates.find(cd => cd.closedDate === startingDate)?.reason}
-                  </small>
+          <TabsContent value="single" className="mt-6">
+            <ScrollArea className="h-[60vh]">
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {error && (
+                  <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                    {error}
+                  </div>
                 )}
-              </div>
 
-              {/* Fixed Booking specific: End Date */}
-              {activeTab === 'fixed' ? (
-                <div className="form-group">
-                  <label htmlFor="endDate">End Date *</label>
-                  <input
-                    type="date"
-                    id="endDate"
-                    value={endDate}
-                    onChange={(e) => {
-                      const selectedEndDate = e.target.value;
-                      if (isDateClosed(selectedEndDate)) {
-                        setError('This end date is closed. Please select a different date.');
-                      } else {
-                        setError(null);
-                      }
-                      setEndDate(selectedEndDate);
-                    }}
-                    min={startingDate || formatDateForComparison(new Date())}
-                    className={isDateClosed(endDate) ? 'date-closed' : ''}
-                    required
+                {/* Common fields for all booking types */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="bookingName">Booking Name *</Label>
+                    <Input
+                      type="text"
+                      id="bookingName"
+                      value={bookingName}
+                      onChange={(e) => setBookingName(e.target.value)}
+                      placeholder="Enter booking name"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Phone Number *</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="tel"
+                        id="phoneNumber"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="+966 xxx xxx xxx"
+                        required
+                        className="flex-1"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        onClick={searchCustomer}
+                        className="px-3"
+                      >
+                        🔍
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Search by name or phone number, or click the search icon.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Duration and time fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="duration">Duration *</Label>
+                    <Select value={duration} onValueChange={setDuration}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select duration" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {durationOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="startTime">Starting Time *</Label>
+                    <Input
+                      type="time"
+                      id="startTime"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Date and court selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startingDate">Starting Date *</Label>
+                    <Input
+                      type="date"
+                      id="startingDate"
+                      value={startingDate}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+                        if (isDateClosed(selectedDate)) {
+                          setError('This date is closed. Please select a different date.');
+                        } else {
+                          setError(null);
+                        }
+                        setStartingDate(selectedDate);
+                      }}
+                      min={formatDateForComparison(new Date())}
+                      className={isDateClosed(startingDate) ? 'border-destructive' : ''}
+                      required
+                    />
+                    {isDateClosed(startingDate) && (
+                      <p className="text-xs text-destructive">
+                        ⚠️ This date is closed: {closedDates.find(cd => cd.closedDate === startingDate)?.reason}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="selectPitch">Select Court *</Label>
+                    <Select value={selectedCourt} onValueChange={setSelectedCourt}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a court" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {courts.map((court) => (
+                          <SelectItem key={court.id || court._id} value={court.id || court._id || ''}>
+                            {court.name} {court.isActive === false ? '(Inactive)' : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Booking Type and Category */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="bookingType">Booking Type *</Label>
+                    <Select value={bookingType} onValueChange={(value) => setBookingType(value as 'SINGLE' | 'TEAM' | 'TOURNAMENT')}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select booking type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SINGLE">Single</SelectItem>
+                        <SelectItem value="TEAM">Team</SelectItem>
+                        <SelectItem value="TOURNAMENT">Tournament</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category (Optional)</Label>
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">No Category</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category._id} value={category._id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Pricing */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="bookingPrice">Booking Price (SAR) *</Label>
+                    <Input
+                      type="number"
+                      id="bookingPrice"
+                      value={bookingPrice}
+                      onChange={(e) => setBookingPrice(e.target.value)}
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="totalReceived">Total Received (SAR)</Label>
+                    <Input
+                      type="number"
+                      id="totalReceived"
+                      value={totalReceived}
+                      onChange={(e) => setTotalReceived(e.target.value)}
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                {/* Payment Status */}
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="paidAtStadium"
+                    checked={paidAtStadium}
+                    onCheckedChange={setPaidAtStadium}
                   />
-                  {isDateClosed(endDate) && (
-                    <small className="date-closed-warning">
-                      ⚠️ This date is closed: {closedDates.find(cd => cd.closedDate === endDate)?.reason}
-                    </small>
-                  )}
+                  <Label htmlFor="paidAtStadium">Paid at Stadium</Label>
                 </div>
-              ) : (
-                <div className="form-group">
-                  <label htmlFor="selectPitch">Select Court *</label>
-                  <select
-                    id="selectPitch"
-                    value={selectedCourt}
-                    onChange={(e) => setSelectedCourt(e.target.value)}
-                    required
-                  >
-                    <option value="">Choose a court</option>
-                    {courts.map((court) => (
-                      <option key={court.id || court._id} value={court.id || court._id}>
-                        {court.name} {court.isActive === false ? '(Inactive)' : ''}
-                      </option>
-                    ))}
-                  </select>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Notes</Label>
+                  <Textarea
+                    id="notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add any additional notes..."
+                    rows={3}
+                  />
                 </div>
-              )}
-            </div>
+
+                {/* Form Actions */}
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? 'Creating...' : 'Add Booking'}
+                  </Button>
+                </div>
 
             {/* Fixed Booking specific: Repeated Day and Court selection in second row */}
             {activeTab === 'fixed' && (
@@ -932,11 +986,31 @@ const BookingModal = ({ isOpen, onClose, courts, selectedDate, clubId, onBooking
               <button type="submit" className="btn-submit" disabled={loading}>
                 {loading ? 'Creating...' : 'Add Booking'}
               </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+              </div>
+              </form>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="fixed" className="mt-6">
+            <ScrollArea className="h-[60vh]">
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Fixed booking form - same content as single but with different fields */}
+                <div className="text-sm text-muted-foreground">Fixed booking content will be rendered here</div>
+              </form>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="coach" className="mt-6">
+            <ScrollArea className="h-[60vh]">
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Coach booking form */}
+                <div className="text-sm text-muted-foreground">Coach booking content will be rendered here</div>
+              </form>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 };
 

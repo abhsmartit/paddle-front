@@ -10,7 +10,7 @@ import BookingModal from '../components/BookingModal';
 import ClosedDates from '../components/ClosedDates';
 import { apiService } from '../services/api';
 import type { ViewMode, Court, Booking, ApiCourt, ApiScheduleCourtBooking } from '../types';
-import '../App.css';
+
 import { format } from 'date-fns';
 
 export default function Dashboard() {
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [courts, setCourts] = useState<Court[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -273,27 +274,11 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        fontSize: '18px',
-        color: '#ef4444',
-        gap: '16px'
-      }}>
-        <div>Error: {error}</div>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="text-lg text-destructive font-medium">Error: {error}</div>
         <button 
           onClick={loadData}
-          style={{
-            padding: '8px 16px',
-            background: '#667eea',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer'
-          }}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
           Retry
         </button>
@@ -328,6 +313,7 @@ export default function Dashboard() {
         <Header
           selectedCourt={courts.length > 0 ? `${courts.length} Courts Available` : 'No Courts'}
           onAddBooking={() => setIsBookingModalOpen(true)}
+          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         />
         {viewMode === 'day' && (
           <ScheduleView 
@@ -374,11 +360,37 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="app">
-      <Sidebar activeItem={activeMenuItem} onItemClick={handleMenuItemClick} />
-      <div className="main-content">
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Desktop Sidebar */}
+      <Sidebar 
+        activeItem={activeMenuItem} 
+        onItemClick={handleMenuItemClick} 
+        isMobile={false}
+      />
+      
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <div className="fixed left-0 top-0 h-full w-60 z-50 md:hidden">
+            <Sidebar 
+              activeItem={activeMenuItem} 
+              onItemClick={(item) => {
+                handleMenuItemClick(item);
+                setIsSidebarOpen(false);
+              }} 
+              isMobile={true}
+            />
+          </div>
+        </>
+      )}
+      
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {renderMainContent()}
-      </div>
+      </main>
     </div>
   );
 }

@@ -3,8 +3,16 @@ import { format, startOfWeek, addDays } from 'date-fns';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { enUS, ar } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { Booking, Court, ViewMode } from '../types';
-import './WeekView.css';
 
 interface WeekViewProps {
   courts: Court[];
@@ -117,126 +125,151 @@ const WeekView = ({ courts, bookings, selectedDate, viewMode, onDateChange, onVi
       );
   };
 
+  // Calculate grid style for week view
+  const getGridStyle = () => {
+    return { gridTemplateColumns: `120px repeat(7, minmax(140px, 1fr))` };
+  };
+
   return (
-    <div className="week-view">
-      <div className="schedule-controls">
-        <div className="schedule-nav-left">
-          <button className="schedule-nav-button" onClick={handlePrevious}>
-            <ChevronLeft size={20} />
-            <span>{t('previous')}</span>
-          </button>
-          <button className="schedule-nav-button" onClick={handleNext}>
-            <span>{t('next')}</span>
-            <ChevronRight size={20} />
-          </button>
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
+      {/* Controls Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-card border-b border-border">
+        {/* Previous / Next Buttons */}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handlePrevious}>
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">{t('previous')}</span>
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleNext}>
+            <span className="hidden sm:inline">{t('next')}</span>
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
         </div>
 
-        <div className="schedule-date-display">
-          <span>{format(selectedDate, 'EEEE MMM dd', { locale })}</span>
-          <ChevronDown size={18} />
-        </div>
+        {/* Date Display */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2 min-w-[180px]">
+              <span className="font-medium">{format(selectedDate, 'EEEE MMM dd', { locale })}</span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-2">
+            <div className="text-sm text-muted-foreground">Calendar picker coming soon</div>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-        <div className="schedule-view-mode-selector">
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'month' ? 'active' : ''}`}
+        {/* View Mode Buttons */}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <Button
+            variant={viewMode === 'month' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'month' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('month')}
           >
             {t('month')}
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'week' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'week' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'week' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('week')}
           >
             {t('week')}
-          </button>
-          <button
-            className={`schedule-view-mode-button ${viewMode === 'day' ? 'active' : ''}`}
+          </Button>
+          <Button
+            variant={viewMode === 'day' ? "default" : "ghost"}
+            size="sm"
+            className={cn("px-4", viewMode === 'day' && "bg-primary text-primary-foreground shadow-sm")}
             onClick={() => onViewModeChange('day')}
           >
             {t('day')}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="week-container">
-        {/* Header with days */}
-        <div className="week-header">
-          <div className="time-column-header">Courts</div>
-          {weekDays.map((day, index) => (
-            <div
-              key={index}
-              className={`day-header ${
-                format(day, 'yyyy-MM-dd') ===
-                format(selectedDate, 'yyyy-MM-dd')
-                  ? 'active'
-                  : ''
-              }`}
-            >
-              <div className="day-name">
-                {format(day, 'EEE', { locale })}
-              </div>
-              <div className="day-date">
-                {format(day, 'MMM dd', { locale })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Court rows */}
-        <div className="week-courts">
-          {courts.map((court) => (
-            <div key={court.id} className="week-court-row">
-              <div className="court-label">
-                <div className="court-name">{court.name}</div>
-                <div className="court-capacity">
-                  ({court.capacity})
+      {/* Week Grid */}
+      <div className="flex-1 overflow-hidden p-4">
+        <Card className="h-full overflow-hidden border shadow-sm">
+          <ScrollArea className="h-full">
+            <div style={{ minWidth: '1100px' }}>
+              {/* Header with days */}
+              <div className="sticky top-0 z-20 bg-card border-b-2 border-border">
+                <div className="grid" style={getGridStyle()}>
+                  <div className="p-3 bg-muted/50 border-r border-border flex items-center justify-center">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Courts</span>
+                  </div>
+                  {weekDays.map((day, index) => {
+                    const isSelected = format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
+                    const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
+                    return (
+                      <div
+                        key={index}
+                        className={cn(
+                          "p-3 text-center border-r border-border last:border-r-0",
+                          isSelected && "bg-primary/10",
+                          isToday && "bg-accent/20"
+                        )}
+                      >
+                        <div className="font-semibold text-sm text-foreground">
+                          {format(day, 'EEE', { locale })}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {format(day, 'MMM dd', { locale })}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {weekDays.map((day, dayIndex) => {
-                const cellSegments = getSegmentsForDayAndCourt(
-                  day,
-                  court.id,
-                );
+              {/* Court rows */}
+              <div>
+                {courts.map((court) => (
+                  <div key={court.id || court._id} className="grid" style={getGridStyle()}>
+                    <div className="p-3 bg-muted/30 border-r border-b border-border flex flex-col items-center justify-center">
+                      <div className="font-semibold text-sm text-foreground">{court.name}</div>
+                      <div className="text-xs text-muted-foreground">({court.capacity})</div>
+                    </div>
 
-                return (
-                  <div
-                    key={dayIndex}
-                    className="week-day-cell"
-                  >
-                    {cellSegments.map((seg) => (
-                      <div
-                        key={`${seg.booking.id}-${seg.dayStr}`}
-                        className={`week-booking ${seg.booking.color}`}
-                        title={`${seg.booking.playerName} - ${formatTime(
-                          seg.booking.startTime,
-                        )} to ${formatTime(
-                          seg.booking.endTime,
-                        )}`}
-                      >
-                        {/* ✅ label uses original times -> matches Day & Month */}
-                        <div className="week-booking-time">
-                          {formatTime(
-                            seg.booking.startTime,
-                          )}{' '}
-                          –{' '}
-                          {formatTime(seg.booking.endTime)}
-                        </div>
-                        <div className="week-booking-name">
-                          {seg.booking.playerName}
-                        </div>
-                      </div>
-                    ))}
+                    {weekDays.map((day, dayIndex) => {
+                      const cellSegments = getSegmentsForDayAndCourt(day, court.id || court._id || '');
+                      const isSelected = format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
 
-                    {cellSegments.length === 0 && (
-                      <div className="empty-cell" />
-                    )}
+                      return (
+                        <div
+                          key={dayIndex}
+                          className={cn(
+                            "min-h-[100px] p-1 border-r border-b border-border last:border-r-0 bg-card",
+                            isSelected && "bg-primary/5"
+                          )}
+                        >
+                          <div className="flex flex-col gap-1">
+                            {cellSegments.map((seg) => (
+                              <div
+                                key={`${seg.booking.id}-${seg.dayStr}`}
+                                className={cn(
+                                  "p-2 rounded-md text-white text-xs shadow-sm cursor-pointer hover:opacity-90 transition-opacity",
+                                  seg.booking.color === 'blue' ? "bg-blue-600" : "bg-green-600"
+                                )}
+                                title={`${seg.booking.playerName} - ${formatTime(seg.booking.startTime)} to ${formatTime(seg.booking.endTime)}`}
+                              >
+                                <div className="font-medium truncate">
+                                  {formatTime(seg.booking.startTime)} – {formatTime(seg.booking.endTime)}
+                                </div>
+                                <div className="truncate opacity-90">{seg.booking.playerName}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+          </ScrollArea>
+        </Card>
       </div>
     </div>
   );
