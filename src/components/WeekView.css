@@ -70,7 +70,7 @@
 .schedule-date-display:hover {
   border-color: var(--accent, #0a0a11);
   background: var(--accent-soft, rgba(99, 102, 241, 0.04));
-  color: var(--accent, #6366f1);
+  color: var(--accent, #070710);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
 }
@@ -93,24 +93,24 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text-main, #333);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); */
   transition: all 0.3s ease;
   min-width: 80px;
   white-space: nowrap;
 }
 
 .schedule-view-mode-button:hover {
-  border-color: #0b0c0c;
+  /* border-color: #0b0c0c; */
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
   transform: translateY(-1px);
   color: #0b0d0c;
 }
 
 .schedule-view-mode-button.active {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  /* background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); */
   color: #fff;
-  border-color: #101913;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  border-color: #000000;
+  /* box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3); */
 }
 
 .week-container {
@@ -161,8 +161,8 @@
 }
 
 .day-header.active {
-  background: var(--accent-soft, linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%));
-  border-bottom: 3px solid var(--accent, #6366f1);
+  background: var(--accent-soft, linear-gradient(135deg, #8bae8e 0%, #81ae8c 100%));
+  border-bottom: 3px solid #74c74a;
 }
 
 .day-name {

@@ -116,16 +116,23 @@
 
 /* HOVER STATE */
 .menu-item:hover {
-  background: #f3f4f6;
+  background: #ffffff;
   color: #111827;
   transform: translateX(1px);
 }
 
-/* ACTIVE ITEM (BLUE PILL) */
 .menu-item.active {
-  background: #040405;
+  background: #030306;
   color: #ffffff;
 }
+
+/* DARK MODE ACTIVE MENU ITEM */
+[data-theme='dark'] .menu-item.active {
+  background: #3fa649!important;   /* your requested green */
+  color: var(--text-main) !important; /* uses your dark mode text variable */
+}
+
+
 
 /* LANGUAGE SWITCHER AREA */
 .sidebar-language {
@@ -138,15 +145,24 @@
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
 }
+/* 🌞 LIGHT MODE — Light Blue Background */
 .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: #ffffff;        /* Light mode background */
+  background: #cfe8ff !important;   /* Light blue */
   color: #111827;
 }
+
+
+/* 🌙 DARK MODE — Green Background */
+[data-theme="dark"] .user-info {
+  background: #8ad692 !important;   /* Green for dark mode */
+  color: #ffffff !important;        /* White text for visibility */
+}
+
 
 /* Avatar circle */
 .user-avatar {
@@ -183,8 +199,14 @@
 /* "admin@padelclub.com" */
 .user-email {
   font-size: 13px;
-  color: #090d13;             /* softer gray but still visible */
+  color: #000000 !important;   /* black in light mode */
 }
+
+/* DARK MODE — keep it black */
+[data-theme="dark"] .user-email {
+  color: #000000 !important;   /* black in dark mode */
+}
+
 
 /* Logout button on right */
 .user-logout-btn {

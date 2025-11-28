@@ -73,19 +73,24 @@
 }
 
 .icon-button:hover {
-  background: #82cc88;
+  background: #ffffff;
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
   transform: translateY(-2px);
 }
 
 .add-button {
-  background: linear-gradient(135deg, #27ae60 0%, #68a17f 100%);
-  color:#eff5f2;
+  /* background: linear-gradient(135deg, #27ae60 0%, #68a17f 100%); */
+  color: #2f3131;           /* light mode icon color: gray */
   box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
+[data-theme="dark"] .add-button {
+  color: #ffffff !important;  /* dark mode icon color */
+}
+
+
 .add-button:hover {
-  color:#27ae60;
-  box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+  color:#ecf0ec;
+  /* box-shadow: 0 6px 16px rgba(119, 121, 119, 0.4); */
   transform: translateY(-2px);
 }

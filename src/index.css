@@ -303,7 +303,7 @@ header {
 [data-theme='dark'] .schedule-date-display,
 [data-theme='dark'] .schedule-view-mode-selector,
 [data-theme='dark'] .date-display-wrapper {
-  background: #020617;
+  background: #030303;
   border-color: var(--border-subtle);
   color: var(--text-main);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
@@ -315,7 +315,7 @@ header {
 }
 
 [data-theme='dark'] .schedule-view-mode-button.active {
-  background: #111827;
+  background: #3fa649 ;
   color: #e3e5f0;
 }
 

@@ -69,10 +69,10 @@
 
 .schedule-date-display:hover {
   /* border-color: #6366f1; */
-  background: rgba(99, 102, 241, 0.04);
+  /* background: rgba(99, 102, 241, 0.04); */
   /* color: #6366f1; */
   transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+  /* box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15); */
 }
 
 .schedule-view-mode-selector {
@@ -82,7 +82,7 @@
 
 .schedule-view-mode-button {
   display: flex;
-  align-items: center;
+  align-items: center;  
   justify-content: center;
   gap: 8px;
   padding: 10px 20px;
@@ -99,19 +99,34 @@
   white-space: nowrap;
 }
 
-.schedule-view-mode-button:hover {
-  /* border-color: #2ecc71; */
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
-  transform: translateY(-1px);
-  color: #818583;
+.schedule-view-mode-button.active {
+  background: #d1d5db !important;   /* gray background */
+  border-color: #c5c7c9 !important; /* gray border */
+  color: #000000 !important;         /* black text */
 }
 
-.schedule-view-mode-button.active {
-  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-  color: #0e0b0b;
-  /* border-color: #7f8481; */
-  /* box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3); */
+/* Light mode hover — stays consistent */
+.schedule-view-mode-button:hover {
+  background: #e5e7eb !important;   /* light gray hover */
+  color: #000000 !important;         /* black text */
 }
+
+/* 🌙 DARK MODE — active button should be GREEN */
+/* 🌙 DARK MODE — active button should be GREEN */
+[data-theme="dark"] .schedule-view-mode-button.active {
+  background: #3fa649 !important;    /* green background */
+  border-color: #3fa649 !important;  /* match border */
+  color: #ffffff !important;         /* white text */
+}
+
+/* 🌙 DARK MODE — keep hover GREEN too */
+[data-theme="dark"] .schedule-view-mode-button.active:hover {
+  background: #3fa649 !important;
+  color: #ffffff !important;
+}
+
+
+
 
 .month-container {
   flex: 1;
