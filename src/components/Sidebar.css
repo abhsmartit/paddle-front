@@ -105,6 +105,11 @@
     color 0.15s ease,
     transform 0.15s ease;
 }
+/* 🌙 DARK MODE — Make menu text white */
+[data-theme="dark"] .menu-item {
+  color: #ffffff !important;
+}
+
 
 .menu-item svg {
   flex-shrink: 0;
